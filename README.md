@@ -34,6 +34,24 @@ To address the challenges outlined previously, this project is divided into two 
 
 **The second part** is dedicated to enhancing the user interface to ensure that the application is user-friendly and effective for learners.
 
+## 2: Data Preparation
+
+For LogoRank, effective data preparation is crucial for training our models to accurately predict the difficulty level of French texts. Below is an overview of our data preparation process:
+
+**Data Augmentation**
+
+To enhance the robustness of our models and increase the diversity of our training examples, we implemented a data augmentation strategy. Our approach involved the following steps:
+
+ 1. Sentence Swapping: Each sentence in the dataset was swapped within its document while preserving the original structure of the text. This method maintains the semantic integrity of the document and ensures that the augmented sentences retain the same difficulty level as the original.
+
+ 2. Appending Augmented Data: Each swapped sentence was then appended to the training dataset as a new data point. This effectively increased the size of our training dataset, allowing our models to learn from a broader array of sentence structures and contexts without introducing label noise.
+
+**Rationale**
+
+The decision not to clean the data was based on an initial assessment which suggested that the dataset was already in good form without major inconsistencies or errors. This approach allowed us to focus our efforts on model training and refinement.
+
+Through this data preparation process, we aimed to create a training environment that mimics real-world applications, where the variety of text structures and contexts is vast. This method prepares our models to perform well across different styles and complexities of French texts.
+
 ## 3: Find the best model to predict the difficulty of French texts
 ### 3.1 Objective
 This part aims to identify the most effective approach for predicting the difficulty level of French texts. To achieve this, the following steps are implemented:
@@ -44,22 +62,61 @@ This part aims to identify the most effective approach for predicting the diffic
 
 **Difficulty Prediction:** The trained model evaluates and classifies the difficulty level of French texts, optimizing learning paths for users at various proficiency levels.
 
-###### Data Preparation
+### 3.2 Best Model Selection: FlauBERT
+#### 3.2.1 Model Choice
+After evaluating several machine learning models, we have chosen FlauBERT as our top performer for the LogoRank project. FlauBERT is specifically designed for the French language, pre-trained on a large corpus of French texts, making it highly effective for understanding the nuances of French text difficulty.
 
-For LogoRank, effective data preparation is crucial for training our models to accurately predict the difficulty level of French texts. Below is an overview of our data preparation process:
-**Data Augmentation**
+FlauBERT was chosen based on its superior performance during preliminary tests with our augmented dataset. As a model specifically designed for the French language, it proved adept at understanding and processing the nuances and complexities of French grammar and vocabulary better than other models we evaluated.
 
-To enhance the robustness of our models and increase the diversity of our training examples, we implemented a data augmentation strategy. Our approach involved the following steps:
+#### 3.2.2 Initial Setup
+We began by preparing our dataset, which included labeled French texts with their corresponding CEFR difficulty levels from A1 to C2. We used the augmented dataset which already had sentences with swapped positions to enrich the variability in text structure while maintaining the difficulty level.
 
-- 1. Sentence Swapping: Each sentence in the dataset was swapped within its document while preserving the original structure of the text. This method maintains the semantic integrity of the document and ensures that the augmented sentences retain the same difficulty level as the original.
+#### 3.2.3 Tokenization
+The texts were tokenized using `FlaubertTokenizer`, configuring the inputs to a maximum length of 128 tokens. This length was chosen to balance between adequately capturing sentence context and computational efficiency.
 
-- 2. Appending Augmented Data: Each swapped sentence was then appended to the training dataset as a new data point. This effectively increased the size of our training dataset, allowing our models to learn from a broader array of sentence structures and contexts without introducing label noise.
+#### 3.2.4 Model Initialization
+`FlauBERTForSequenceClassification` was initialized with six output labels corresponding to the six difficulty levels in our dataset. This setup ensures that the model predictions are directly aligned with the expected difficulty classifications.
 
-**Rationale**
+#### 3.2.5 Training Process
 
-The decision not to clean the data was based on an initial assessment which suggested that the dataset was already in good form without major inconsistencies or errors. This approach allowed us to focus our efforts on model training and refinement.
+1. Full Dataset Utilization: We trained the model on the entire labeled dataset provided by the competition, without holding out a separate validation set. This approach was chosen to maximize the learning potential from the available data.
 
-Through this data preparation process, we aimed to create a training environment that mimics real-world applications, where the variety of text structures and contexts is vast. This method prepares our models to perform well across different styles and complexities of French texts.
+2. Iterative Training Loops: To further enhance model performance, we implemented a two-loop training process:
+   - First Loop: The initial training phase involved adjusting general model parameters to adapt the pre-trained FlauBERT to our task-specific data. We used 5 training epochs, a batch size of 32, and a warmup step count of 500 to help stabilize the learning rate early in training.
+
+   - Second Loop: In the second training phase, we fine-tuned specific parameters that influence learning rates and optimization, allowing the model to adjust more delicately to the complexities of the task. At the end the same training parameters were used to continue training the model for another 5 epochs. This additional training helped to refine the model's understanding of text complexities and further improve its prediction accuracy.
+
+
+These adjustments were essential for tailoring the pre-trained FlauBERT model to our specific needs, leading to improved accuracy and robustness in predicting the difficulty levels of French texts.
+
+#### 3.2.6 Results
+
+This two-phase training approach resulted in significantly higher accuracy of 0.640 in predicting text difficulty levels on the unlabeled dataset. This process also demonstrated the effectiveness of fine-tuning a language-specific pre-trained model on a specialized task such as text difficulty classification.
+
+#### 3.2.7 Implications
+
+The success of FlauBERT in our project underscores the importance of choosing a model well-suited to the language and nature of the task. Additionally, the iterative fine-tuning strategy highlights the benefits of a phased approach to training deep learning models, particularly when working with complex datasets.
+Model Performance and Validation
+
+#### 3.2.8 Data Splitting Strategy
+
+To ensure that our model generalizes well to unseen data, we divided our dataset into training (90%) and validation (10%) sets. This split enabled us to train the model effectively while also monitoring its performance on the validation data, which helps identify overfitting and allows for parameter adjustments.
+
+**Training Outcomes**
+
+Throughout the training process, we tracked several key performance metrics: Training Loss, Validation Loss, Accuracy, and F1 Score. Here is a summary of the training outcomes after completing five training epochs:
+
+- Best Accuracy: 89.27%
+- Best F1 Score: 0.89296
+- Final Validation Loss: 0.62378
+
+These metrics indicate that the model’s ability to predict text difficulty levels improved significantly over time. The final epoch results, showing the highest accuracy and F1 score, suggest that the model reached a stable and effective state in understanding the complexity of French texts.
+![image](https://github.com/mariamnassar19/ML-project/assets/150010028/1fe47891-6bcf-4f67-b185-7b6eedc93e95)
+#### 3.2.9 Insights and Evaluation
+
+Our approach to validating the model involved rigorous monitoring of performance metrics, ensuring that we could observe and react to the model's learning progression. The decreasing trend in validation loss alongside improvements in accuracy and F1 scores across training epochs demonstrates the model’s robustness and effectiveness.
+
+This systematic monitoring and evaluation confirm that our model is reliable and accurate for predicting text difficulty, enhancing the learning experience for users at various French language proficiency levels.
 
 ### 3.3 Not Good Model - Feature Extraction and Difficulty Prediction with Camembert
 #### 3.3.1 Overview

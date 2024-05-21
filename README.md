@@ -66,21 +66,10 @@ This part aims to identify the most effective approach for predicting the diffic
 **Difficulty Prediction:** The trained model evaluates and classifies the difficulty level of French texts, optimizing learning paths for users at various proficiency levels.
 
 ## 3.2 Best Model Selection: FlauBERT
-### 3.2.1 Model Choice
-After evaluating several machine learning models, we have chosen FlauBERT as our top performer for the LogoRank project. FlauBERT is specifically designed for the French language, pre-trained on a large corpus of French texts, making it highly effective for understanding the nuances of French text difficulty.
+### 3.2.1 Overview
+In the project, after evaluating multiple machine learning models, we selected FlauBERT as the most effective for classifying the difficulty levels of French texts. FlauBERT, which is designed specifically for the French language and pre-trained on a vast corpus of French texts, excelled in preliminary tests with our augmented dataset, demonstrating superior capability in handling the complexities of French grammar and vocabulary. We prepared a labeled dataset with French texts corresponding to CEFR difficulty levels from A1 to C2, employing an augmented dataset that enhances text structure variability while preserving difficulty integrity. Texts were tokenized using `FlaubertTokenizer` set to a maximum length of 128 tokens to balance contextual richness with computational efficiency. We initialized `FlauBERTForSequenceClassification` with six output labels to match the dataset's six difficulty levels, ensuring precise alignment with the expected classifications. This setup positions the project to optimize model performance through multiple training phases, making it ideal for researchers and developers in need of high-performing text classification solutions.
 
-FlauBERT was chosen based on its superior performance during preliminary tests with our augmented dataset. As a model specifically designed for the French language, it proved adept at understanding and processing the nuances and complexities of French grammar and vocabulary better than other models we evaluated.
-
-### 3.2.2 Initial Setup
-We began by preparing our dataset, which included labeled French texts with their corresponding CEFR difficulty levels from A1 to C2. We used the augmented dataset which already had sentences with swapped positions to enrich the variability in text structure while maintaining the difficulty level.
-
-### 3.2.3 Tokenization
-The texts were tokenized using `FlaubertTokenizer`, configuring the inputs to a maximum length of 128 tokens. This length was chosen to balance between adequately capturing sentence context and computational efficiency.
-
-### 3.2.4 Model Initialization
-`FlauBERTForSequenceClassification` was initialized with six output labels corresponding to the six difficulty levels in our dataset. This setup ensures that the model predictions are directly aligned with the expected difficulty classifications.
-
-### 3.2.5 Training Process
+### 3.2.2 Best model
 
 1. Full Dataset Utilization: We trained the model on the entire labeled dataset provided by the competition, without holding out a separate validation set. This approach was chosen to maximize the learning potential from the available data.
 
@@ -89,37 +78,59 @@ The texts were tokenized using `FlaubertTokenizer`, configuring the inputs to a 
 
    - Second Loop: In the second training phase, we fine-tuned specific parameters that influence learning rates and optimization, allowing the model to adjust more delicately to the complexities of the task. At the end the same training parameters were used to continue training the model for another 5 epochs. This additional training helped to refine the model's understanding of text complexities and further improve its prediction accuracy.
 
-
 These adjustments were essential for tailoring the pre-trained FlauBERT model to our specific needs, leading to improved accuracy and robustness in predicting the difficulty levels of French texts.
 
-### 3.2.6 Results
+### 3.2.3 Results
 
 This two-phase training approach resulted in significantly higher accuracy of 0.640 in predicting text difficulty levels on the unlabeled dataset. This process also demonstrated the effectiveness of fine-tuning a language-specific pre-trained model on a specialized task such as text difficulty classification.
 
-### 3.2.7 Implications
+### 3.2.4 Performance Evaluation 
+#### - **`Compute_metrics`** 
+We use `train_test_split` from `sklearn.model_selection` to divide the dataset into a training set and a validation set, with 10% serving as validation data for periodic performance assessment. It employs `Trainer` from the Hugging Face `transformers` library, configured with `TrainingArguments` to evaluate the model at the end of each epoch, using metrics including accuracy and F1 score computed through a `compute_metrics` function to measure its efficacy in classifying French texts by difficulty levels. After initial training and saving, the script allows for optional continued training to further optimize the model on the same or additional data, adjusting parameters or extending epochs to enhance accuracy and F1 scores.
+
+**First Training Run:**
+
+<img width="664" alt="截屏2024-05-22 01 21 48" src="https://github.com/mariamnassar19/ML-project/assets/150010028/8aa2db47-3d3c-4ecc-9d6d-5d4cdea38323">
+
+- **Training Loss** significantly reduced from 1.2967 to 0.1319, indicating that the model effectively optimized its parameters and reduced errors during the learning process.
+
+- **Validation Loss** decreased from 1.1200 to 0.4980, demonstrating enhanced generalization capabilities of the model on unseen data.
+
+- **Accuracy, Precision, Recall, and F1 Score** all improved markedly, especially the F1 score which increased from 0.5274 to 0.8548, showing the model’s improved performance in balancing the recognition of positives and avoiding false positives.
+
+**Second Training Run:**
+
+<img width="689" alt="截屏2024-05-22 01 09 42" src="https://github.com/mariamnassar19/ML-project/assets/150010028/1a31f9f8-020d-4039-8aa4-28d7b08b01d3">
+
+- **Training Loss** further decreased, starting at 0.1518 and ending at 0.0439, indicating a more efficient training process.
+  
+- **Validation Loss** remained relatively stable and finally decreased slightly to 0.5364.
+ 
+- **Performance Metrics** reached higher levels after the second training, particularly with accuracy improving to 0.9031, reflecting enhanced understanding and classification ability of the dataset by the model
+
+**Comprehensive Evaluation:**
+These results illustrate consistent progress in the model as training progresses, particularly noticeable in the key performance indicators. Model performance in the second training generally surpassed the first, likely due to optimized training strategies, parameter adjustments, or more effective data handling techniques.
+
+#### -**Confusion Matrix**
+
+Post-training, we extend its evaluation methods to include the generation of a confusion matrix. This confusion matrix displays the performance of the model in classifying French texts into different difficulty levels after additional training.
+
+<img width="528" alt="截屏2024-05-22 01 30 08" src="https://github.com/mariamnassar19/ML-project/assets/150010028/2115c152-9369-4600-882e-98420b672b1c">
+
+**Key Insights:**
+- **A1 and A2**: High accuracy with few misclassifications. A1 had 144 correct predictions and 5 misclassifications as A2. A2 had 162 correct predictions with minor confusion with A1 and B1.
+- **B1 and B2**: Good performance with some room for improvement. B1 had 153 correct predictions but was sometimes confused with A1, A2, and B2. B2 was mostly misclassified as adjacent categories C1 and C2.
+- **C1 and C2**: Correct predictions were 144 for C1 and 138 for C2, with some confusion noted between these two highest difficulty levels and B2.
+
+**Conclusion:**
+The model performs well for lower difficulty levels (A1, A2) with minimal errors. For higher difficulty levels (B2, C1, and C2), the model faces challenges distinguishing between adjacent categories, likely due to similar features in texts of close difficulty levels.
+
+### 3.2.5 Conclusion
 
 The success of FlauBERT in our project underscores the importance of choosing a model well-suited to the language and nature of the task. Additionally, the iterative fine-tuning strategy highlights the benefits of a phased approach to training deep learning models, particularly when working with complex datasets.
-Model Performance and Validation
 
-### 3.2.8 Data Splitting Strategy
 
-To ensure that our model generalizes well to unseen data, we divided our dataset into training (90%) and validation (10%) sets. This split enabled us to train the model effectively while also monitoring its performance on the validation data, which helps identify overfitting and allows for parameter adjustments.
 
-**Training Outcomes**
-
-Throughout the training process, we tracked several key performance metrics: Training Loss, Validation Loss, Accuracy, and F1 Score. Here is a summary of the training outcomes after completing five training epochs:
-
-- Best Accuracy: 89.27%
-- Best F1 Score: 0.89296
-- Final Validation Loss: 0.62378
-
-These metrics indicate that the model’s ability to predict text difficulty levels improved significantly over time. The final epoch results, showing the highest accuracy and F1 score, suggest that the model reached a stable and effective state in understanding the complexity of French texts.
-![image](https://github.com/mariamnassar19/ML-project/assets/150010028/1fe47891-6bcf-4f67-b185-7b6eedc93e95)
-### 3.2.9 Insights and Evaluation
-
-Our approach to validating the model involved rigorous monitoring of performance metrics, ensuring that we could observe and react to the model's learning progression. The decreasing trend in validation loss alongside improvements in accuracy and F1 scores across training epochs demonstrates the model’s robustness and effectiveness.
-
-This systematic monitoring and evaluation confirm that our model is reliable and accurate for predicting text difficulty, enhancing the learning experience for users at various French language proficiency levels.
 
 ## 3.3 Alternative Models - Feature Extraction and Difficulty Prediction with Camembert
 ### 3.3.1 Overview

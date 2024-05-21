@@ -10,4 +10,4 @@ whisper
 google-api-python-client
 nltk
 python-dotenv
-torch==1.11.0
+torch==1.10.0+cpu -f https://download.pytorch.org/whl/torch_stable.html

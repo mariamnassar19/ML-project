@@ -10,3 +10,4 @@ google-api-python-client
 nltk
 python-dotenv
 torch==2.0.1
+sacremoses

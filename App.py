@@ -18,13 +18,11 @@ import nltk
 nltk.download('stopwords')
 
 # Retrieve API key from Streamlit secrets
-api_key = st.secrets["YOUTUBE_API_KEY"]
-
-# Print the API key to verify it's being read correctly (Remove this after debugging)
-print(f"API Key: {api_key}")
-
-if not api_key:
-    raise ValueError("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set.")
+try:
+    api_key = st.secrets["YOUTUBE_API_KEY"]
+except KeyError:
+    st.error("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set in Streamlit secrets.")
+    st.stop()
 
 # Initialize the YouTube client
 youtube = build('youtube', 'v3', developerKey=api_key)

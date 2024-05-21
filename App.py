@@ -13,6 +13,7 @@ import whisper
 from googleapiclient.discovery import build
 from nltk.corpus import stopwords
 import nltk
+import torch  # Ensure torch is imported
 
 # Download the stopwords from nltk
 nltk.download('stopwords')
@@ -259,3 +260,4 @@ try:
 except Exception as e:
     st.error("An error occurred: {}".format(str(e)))
     traceback.print_exc()
+

@@ -118,7 +118,7 @@ Our approach to validating the model involved rigorous monitoring of performance
 
 This systematic monitoring and evaluation confirm that our model is reliable and accurate for predicting text difficulty, enhancing the learning experience for users at various French language proficiency levels.
 
-### 3.3 Not Good Model - Feature Extraction and Difficulty Prediction with Camembert
+### 3.3 Alternative Models - Feature Extraction and Difficulty Prediction with Camembert
 #### 3.3.1 Overview
 
 This model utilizes the Camembert BERT model to extract features from French sentences and predict their difficulty levels using a classifier trained on different language complexity data. It is designed to assess the proficiency level required to comprehend each sentence, categorizing them from A1 (easiest) to C2 (most difficult) based on the Common European Framework of Reference for Languages (CEFR).

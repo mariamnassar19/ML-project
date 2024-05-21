@@ -168,5 +168,96 @@ In conclusion, choosing the FlaubertForSequenceClassification model over the Cam
 
 
 
+# Text Difficulty Prediction App
+
+This Streamlit application predicts the difficulty level of French sentences. It provides various input methods for users to analyze text difficulty and suggest YouTube videos based on difficulty levels. The app uses the `Flaubert` model for text classification and `Whisper` model for speech-to-text transcription.
+
+## Features
+
+1. **Upload CSV**: Upload a CSV file containing French sentences for batch processing.
+2. **Input Sentence**: Enter a single French sentence for difficulty prediction.
+3. **Input Long Text**: Input long French texts, such as song lyrics or paragraphs, for sentence-wise difficulty prediction.
+4. **YouTube Video URL**: Provide a YouTube video URL to transcribe its audio and predict the difficulty of the transcribed text.
+5. **Find YouTube Videos by Difficulty**: Select a difficulty level to get suggested YouTube videos appropriate for that level.
+6. **Record or Upload Audio**: Upload an audio file to transcribe and predict the difficulty of the transcribed text.
+
+## Installation
+
+1. **Clone the Repository**:
+   ```sh
+   git clone https://github.com/your_username/your_repository.git
+   cd your_repository
+   ```
+
+2. **Create a Virtual Environment**:
+   ```sh
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
+
+3. **Install Dependencies**:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+4. **Set Up Environment Variables**:
+   Create a `.env` file in the root directory and add your YouTube API key:
+   ```sh
+   YOUTUBE_API_KEY=your_actual_api_key
+   ```
+
+## Usage
+
+1. **Run the Streamlit Application**:
+   ```sh
+   streamlit run your_script_name.py
+
+   ```
+
+2. **Navigate the App**:
+   - **Upload CSV**: Upload a CSV file with a `sentence` column.
+   - **Input Sentence**: Enter a single sentence in the text area.
+   - **Input Long Text**: Enter long text, such as paragraphs or song lyrics.
+   - **YouTube Video URL**: Enter a YouTube video URL to analyze the audio.
+   - **Find YouTube Videos by Difficulty**: Select a difficulty level to get video suggestions.
+   - **Record or Upload Audio**: Upload an audio file to transcribe and analyze.
+
+## Requirements
+
+- `streamlit`
+- `pandas`
+- `transformers`
+- `datasets`
+- `matplotlib`
+- `seaborn`
+- `wordcloud`
+- `pytube`
+- `whisper`
+- `google-api-python-client`
+- `nltk`
+- `python-dotenv`
+
+
+
+## API Key Configuration
+
+To set up your YouTube API key, you can either hardcode your API key, or follow these steps:
+
+1. **Create a `.env` File**:
+   - In the root directory of your project, create a file named `.env`.
+   - Add the following line, replacing `your_actual_api_key` with your actual YouTube API key:
+     ```sh
+     YOUTUBE_API_KEY=your_actual_api_key
+     ```
+
+2. **Load Environment Variables in Your Script**:
+   - Ensure your Python script loads the environment variables using the `python-dotenv` package:
+     ```python
+     from dotenv import load_dotenv
+     load_dotenv()
+     api_key = os.getenv('YOUTUBE_API_KEY')
+     ```
+
+
 
 

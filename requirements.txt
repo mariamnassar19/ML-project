@@ -1,0 +1,12 @@
+streamlit
+pandas
+transformers
+datasets
+matplotlib
+seaborn
+wordcloud
+pytube
+whisper
+google-api-python-client
+nltk
+python-dotenv

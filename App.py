@@ -9,7 +9,7 @@ import traceback
 import warnings
 from pytube import YouTube
 from googleapiclient.discovery import build
-import whisper  # Changed from openai_whisper to whisper
+import whisper
 import os
 from dotenv import load_dotenv
 
@@ -48,12 +48,11 @@ def display_video_results(videos):
 warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
-# Load the model and tokenizer
-model_path =  "mn00/Flaubert"
-
+# Load the model and tokenizer from Hugging Face Hub
+model_name = "mn00/Flaubert"
 try:
-    model = FlaubertForSequenceClassification.from_pretrained(model_path)
-    tokenizer = FlaubertTokenizer.from_pretrained(model_path)
+    model = FlaubertForSequenceClassification.from_pretrained(model_name)
+    tokenizer = FlaubertTokenizer.from_pretrained(model_name)
     trainer = Trainer(model=model)
     whisper_model = whisper.load_model("base")
 
@@ -101,9 +100,9 @@ try:
                     # Generate and display word cloud with stopwords removed
                     st.subheader('Word Cloud of Sentences')
                     text = ' '.join(data['sentence'])
-                    stopwords_fr = set(STOPWORDS)
+                    stopwords = set(STOPWORDS).union(set(["de", "la", "le", "et", "les", "des", "du", "un", "une"]))  # Add common French stopwords
                     wordcloud = WordCloud(width=800, height=400, background_color='white',
-                                          stopwords=stopwords_fr).generate(text)
+                                          stopwords=stopwords).generate(text)
                     plt.figure(figsize=(10, 5))
                     plt.imshow(wordcloud, interpolation='bilinear')
                     plt.axis('off')
@@ -168,9 +167,9 @@ try:
                     # Generate and display word cloud with stopwords removed
                     st.subheader('Word Cloud of Sentences')
                     text = ' '.join(data['sentence'])
-                    stopwords_fr = set(STOPWORDS)
+                    stopwords = set(STOPWORDS).union(set(["de", "la", "le", "et", "les", "des", "du", "un", "une"]))  # Add common French stopwords
                     wordcloud = WordCloud(width=800, height=400, background_color='white',
-                                          stopwords=stopwords_fr).generate(text)
+                                          stopwords=stopwords).generate(text)
                     plt.figure(figsize=(10, 5))
                     plt.imshow(wordcloud, interpolation='bilinear')
                     plt.axis('off')

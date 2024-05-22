@@ -12,6 +12,8 @@ import speech_recognition as sr
 import os
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
+import plotly.express as px
+from streamlit_player import st_player
 
 # Load environment variables from .env file
 load_dotenv()
@@ -43,31 +45,97 @@ def display_video_results(videos):
 
         st.write(f"### {video_title}")
         st.write(f"Description: {video_description[:200]}...")  # Show first 200 characters
-        st.markdown(f"[Watch Video]({video_link})")
+        st_player(video_link)
 
-# Suppress specific warnings
-warnings.filterwarnings("ignore",
-                        message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
-
-# Load the model and tokenizer from Hugging Face Hub
-model_name = "mn00/Flaubert"
-try:
+def load_model_and_tokenizer(model_name="mn00/trial"):
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
     trainer = Trainer(model=model)
+    return model, tokenizer, trainer
 
-    # Difficulty mapping
-    difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
+def predict_difficulty(trainer, tokenizer, sentences):
+    data = pd.DataFrame({'sentence': sentences})
+    dataset = Dataset.from_pandas(data)
+    dataset = dataset.map(lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
+    dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
+    predictions = trainer.predict(dataset).predictions
+
+    # Print raw predictions for debugging
+    st.write("Raw Predictions:", predictions)
+
+    predicted_classes = predictions.argmax(axis=1)
+
+    # Print confidence scores for each class for debugging
+    confidence_scores = predictions.softmax(axis=1)
+    st.write("Confidence Scores:", confidence_scores)
+
+    return predicted_classes
+
+def display_predictions(data, difficulty_mapping):
+    st.dataframe(data[['sentence', 'difficulty']])
+
+    # Display prediction distribution with Plotly
+    st.subheader('Prediction Distribution')
+    fig = px.histogram(data, x='difficulty', category_orders={'difficulty': list(difficulty_mapping.values())})
+    st.plotly_chart(fig)
+
+    # Generate and display word cloud with stopwords removed
+    st.subheader('Word Cloud of Sentences')
+    text = ' '.join(data['sentence'])
+    stopwords = set(STOPWORDS).union({"de", "la", "le", "et", "les", "des", "du", "un", "une"})  # Add common French stopwords
+    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords).generate(text)
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    st.pyplot()
+
+    st.download_button(label='Download Predictions', data=data.to_csv(index=False).encode('utf-8'), file_name='predicted_difficulties.csv', mime='text/csv')
+
+def process_youtube_audio(youtube_url):
+    yt = YouTube(youtube_url)
+    audio_stream = yt.streams.filter(only_audio=True).first()
+    audio_file = audio_stream.download(filename="audio.mp4")
+
+    # Transcribe audio to text
+    recognizer = sr.Recognizer()
+    with sr.AudioFile("audio.mp4") as source:
+        audio_data = recognizer.record(source)
+        transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
+    
+    os.remove("audio.mp4")  # Clean up audio file after processing
+    return transcribed_text
+
+def process_uploaded_audio(audio_file):
+    # Save the uploaded audio file
+    with open("uploaded_audio.wav", "wb") as f:
+        f.write(audio_file.getbuffer())
+
+    # Transcribe audio to text
+    recognizer = sr.Recognizer()
+    with sr.AudioFile("uploaded_audio.wav") as source:
+        audio_data = recognizer.record(source)
+        transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
+
+    os.remove("uploaded_audio.wav")  # Clean up audio file after processing
+    return transcribed_text
+
+# Suppress specific warnings
+warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
+
+# Load the model and tokenizer from Hugging Face Hub
+model_name = "mn00/Flaubert"
+difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
+
+try:
+    model, tokenizer, trainer = load_model_and_tokenizer(model_name)
 
     # Define the Streamlit layout
     st.title('Text Difficulty Prediction App')
-    st.write(
-        'This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, record audio, or input long texts such as song lyrics.')
+    st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, record audio, or input long texts such as song lyrics.')
 
     # Tab layout for file upload, text input, long text input, YouTube video input, YouTube videos by difficulty, and audio input
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-        ["Upload CSV", "Input Sentence", "Input Long Text", "YouTube Video URL", "YouTube Videos by Difficulty",
-         "Record or Upload Audio"])
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
+        ["Upload CSV", "Input Sentence", "Input Long Text", "YouTube Video URL", "YouTube Videos by Difficulty", "Record or Upload Audio", "User Feedback"])
 
     with tab1:
         st.header("Upload CSV File")
@@ -80,42 +148,16 @@ try:
                     with st.spinner('Predicting...'):
                         # Processing and prediction
                         data['sentence'] = data['sentence'].astype(str)
-                        dataset = Dataset.from_pandas(data)
-                        dataset = dataset.map(
-                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                                       max_length=512), batched=True)
-                        dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
-                        predictions = trainer.predict(dataset).predictions
-                        predicted_classes = predictions.argmax(axis=1)
+                        predicted_classes = predict_difficulty(trainer, tokenizer, data['sentence'])
                         data['difficulty'] = [difficulty_mapping[i] for i in predicted_classes]
 
                         st.write('Predictions complete!')
-                        st.dataframe(data[['sentence', 'difficulty']])
-
-                        # Display prediction distribution
-                        st.subheader('Prediction Distribution')
-                        fig, ax = plt.subplots()
-                        sns.countplot(x='difficulty', data=data, order=difficulty_mapping.values(), ax=ax)
-                        st.pyplot(fig)
-
-                        # Generate and display word cloud with stopwords removed
-                        st.subheader('Word Cloud of Sentences')
-                        text = ' '.join(data['sentence'])
-                        stopwords = set(STOPWORDS).union({"de", "la", "le", "et", "les", "des", "du", "un", "une"})  # Add common French stopwords
-                        wordcloud = WordCloud(width=800, height=400, background_color='white',
-                                              stopwords=stopwords).generate(text)
-                        plt.figure(figsize=(10, 5))
-                        plt.imshow(wordcloud, interpolation='bilinear')
-                        plt.axis('off')
-                        st.pyplot()
-
-                        st.download_button(label='Download Predictions', data=data.to_csv(index=False).encode('utf-8'),
-                                           file_name='predicted_difficulties.csv', mime='text/csv')
+                        display_predictions(data, difficulty_mapping)
+                else:
+                    st.error('Uploaded file does not contain required "sentence" column.')
             except Exception as e:
                 st.error(f"An error occurred during prediction: {str(e)}")
                 traceback.print_exc()
-        else:
-            st.error('Uploaded file does not contain required "sentence" column.')
 
     with tab2:
         st.header("Input Sentence Directly")
@@ -124,16 +166,8 @@ try:
             if sentence:
                 with st.spinner('Predicting...'):
                     try:
-                        # Process the sentence
-                        dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [sentence]}))
-                        dataset = dataset.map(
-                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                                       max_length=512), batched=True)
-                        dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
-                        predictions = trainer.predict(dataset).predictions
-                        predicted_class = predictions.argmax(axis=1)
-                        predicted_difficulty = difficulty_mapping[predicted_class[0]]
-
+                        predicted_classes = predict_difficulty(trainer, tokenizer, [sentence])
+                        predicted_difficulty = difficulty_mapping[predicted_classes[0]]
                         st.success(f'The predicted difficulty level for the input sentence is: {predicted_difficulty}')
                     except Exception as e:
                         st.error(f"An error occurred during prediction: {str(e)}")
@@ -149,39 +183,14 @@ try:
                     try:
                         # Split the long text into sentences (assuming sentences are separated by periods)
                         sentences = long_text.split('.')
-                        sentences = [sentence.strip() for sentence in sentences if
-                                     sentence.strip()]  # Remove empty sentences
+                        sentences = [sentence.strip() for sentence in sentences if sentence.strip()]  # Remove empty sentences
 
                         # Process and predict each sentence
-                        data = pd.DataFrame({'sentence': sentences})
-                        dataset = Dataset.from_pandas(data)
-                        dataset = dataset.map(
-                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                                       max_length=512), batched=True)
-                        dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
-                        predictions = trainer.predict(dataset).predictions
-                        predicted_classes = predictions.argmax(axis=1)
-                        data['difficulty'] = [difficulty_mapping[i] for i in predicted_classes]
+                        predicted_classes = predict_difficulty(trainer, tokenizer, sentences)
+                        data = pd.DataFrame({'sentence': sentences, 'difficulty': [difficulty_mapping[i] for i in predicted_classes]})
 
                         st.write('Predictions complete!')
-                        st.dataframe(data[['sentence', 'difficulty']])
-
-                        # Display prediction distribution
-                        st.subheader('Prediction Distribution')
-                        fig, ax = plt.subplots()
-                        sns.countplot(x='difficulty', data=data, order=difficulty_mapping.values(), ax=ax)
-                        st.pyplot(fig)
-
-                        # Generate and display word cloud with stopwords removed
-                        st.subheader('Word Cloud of Sentences')
-                        text = ' '.join(data['sentence'])
-                        stopwords = set(STOPWORDS).union({"de", "la", "le", "et", "les", "des", "du", "un", "une"})  # Add common French stopwords
-                        wordcloud = WordCloud(width=800, height=400, background_color='white',
-                                              stopwords=stopwords).generate(text)
-                        plt.figure(figsize=(10, 5))
-                        plt.imshow(wordcloud, interpolation='bilinear')
-                        plt.axis('off')
-                        st.pyplot()
+                        display_predictions(data, difficulty_mapping)
                     except Exception as e:
                         st.error(f"An error occurred during prediction: {str(e)}")
 
@@ -192,33 +201,14 @@ try:
             if youtube_url:
                 with st.spinner('Processing YouTube video...'):
                     try:
-                        # Download the YouTube video
-                        yt = YouTube(youtube_url)
-                        audio_stream = yt.streams.filter(only_audio=True).first()
-                        audio_file = audio_stream.download(filename="audio.mp4")
-
-                        # Transcribe audio to text
-                        recognizer = sr.Recognizer()
-                        audio_path = "audio.mp4"
-                        with sr.AudioFile(audio_path) as source:
-                            audio_data = recognizer.record(source)
-                            transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
-
+                        transcribed_text = process_youtube_audio(youtube_url)
                         st.write("Transcription:")
                         st.write(transcribed_text)
 
-                        # Process the transcribed text
-                        dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [transcribed_text]}))
-                        dataset = dataset.map(
-                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                                       max_length=512), batched=True)
-                        dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
-                        predictions = trainer.predict(dataset).predictions
-                        predicted_class = predictions.argmax(axis=1)
-                        predicted_difficulty = difficulty_mapping[predicted_class[0]]
-
-                        st.success(
-                            f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
+                        with st.spinner('Predicting difficulty...'):
+                            predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
+                            predicted_difficulty = difficulty_mapping[predicted_classes[0]]
+                            st.success(f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
                     except Exception as video_error:
                         st.error(f"Error processing video: {video_error}")
                         traceback.print_exc()
@@ -239,34 +229,33 @@ try:
         if audio_file is not None:
             with st.spinner('Transcribing audio...'):
                 try:
-                    # Save the uploaded audio file
-                    with open("uploaded_audio.wav", "wb") as f:
-                        f.write(audio_file.getbuffer())
-
-                    # Transcribe audio to text
-                    recognizer = sr.Recognizer()
-                    with sr.AudioFile("uploaded_audio.wav") as source:
-                        audio_data = recognizer.record(source)
-                        transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
-
+                    transcribed_text = process_uploaded_audio(audio_file)
                     st.write("Transcription:")
                     st.write(transcribed_text)
 
                     with st.spinner('Predicting difficulty...'):
-                        # Process the transcribed text
-                        dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [transcribed_text]}))
-                        dataset = dataset.map(
-                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                                       max_length=512), batched=True)
-                        dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
-                        predictions = trainer.predict(dataset).predictions
-                        predicted_class = predictions.argmax(axis=1)
-                        predicted_difficulty = difficulty_mapping[predicted_class[0]]
-
+                        predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
+                        predicted_difficulty = difficulty_mapping[predicted_classes[0]]
                         st.success(f'The predicted difficulty level for the transcribed audio is: {predicted_difficulty}')
                 except Exception as e:
                     st.error(f"Error processing audio: {e}")
                     traceback.print_exc()
+
+    with tab7:
+        st.header("User Feedback")
+        feedback_sentence = st.text_area("Enter a sentence and its difficulty level for feedback:")
+        feedback_difficulty = st.selectbox("Select the difficulty level:", ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
+        if st.button("Submit Feedback"):
+            if feedback_sentence and feedback_difficulty:
+                try:
+                    with open("feedback.csv", "a") as f:
+                        f.write(f"{feedback_sentence},{feedback_difficulty}\n")
+                    st.success("Thank you for your feedback!")
+                except Exception as e:
+                    st.error(f"An error occurred while saving feedback: {str(e)}")
+                    traceback.print_exc()
+            else:
+                st.error("Please enter a sentence and select a difficulty level.")
 
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")

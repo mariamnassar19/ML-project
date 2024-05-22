@@ -56,7 +56,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'shiqi-017/flaubert'
+model_path = 'models/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
@@ -168,6 +168,10 @@ try:
                         # Download the YouTube video
                         yt = YouTube(youtube_url)
                         audio_stream = yt.streams.filter(only_audio=True).first()
+                        if audio_stream is None:
+                            st.error("No audio stream available for this video.")
+                            st.stop()
+
                         audio_file = audio_stream.download(filename="audio.mp4")
 
                         # Convert audio to WAV format using pydub

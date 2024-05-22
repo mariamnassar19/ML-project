@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from transformers import FlaubertTokenizer, FlaubertForSequenceClassification, Trainer
+from transformers import FlaubertTokenizer, FlaubertForSequenceClassification, Trainer, AddedToken
 from datasets import Dataset
 import traceback
 import warnings

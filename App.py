@@ -9,7 +9,7 @@ from wordcloud import WordCloud
 import traceback
 import warnings
 from pytube import YouTube
-import whisper
+import speech_recognition as sr
 from googleapiclient.discovery import build
 from nltk.corpus import stopwords
 import nltk
@@ -59,7 +59,6 @@ try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
     tokenizer = FlaubertTokenizer.from_pretrained(model_path)
     trainer = Trainer(model=model)
-    whisper_model = whisper.load_model("base")
 
     # Difficulty mapping
     difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
@@ -67,7 +66,7 @@ try:
     # Define the Streamlit layout
     st.title('Text Difficulty Prediction App')
     st.write(
-        'This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, record audio, or input long texts such as song lyrics.')
+        'This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, or input long texts such as song lyrics.')
 
     # Tab layout for file upload, text input, long text input, YouTube video input, YouTube videos by difficulty, and feedback
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
@@ -190,9 +189,12 @@ try:
                         audio_stream = yt.streams.filter(only_audio=True).first()
                         audio_file = audio_stream.download(filename="audio.mp4")
 
-                        # Transcribe audio to text
-                        transcription = whisper_model.transcribe(audio_file)
-                        transcribed_text = transcription['text']
+                        # Transcribe audio to text using SpeechRecognition
+                        recognizer = sr.Recognizer()
+                        with sr.AudioFile(audio_file) as source:
+                            audio = recognizer.record(source)
+                            transcribed_text = recognizer.recognize_google(audio, language="fr-FR")
+
                         os.remove(audio_file)  # Remove audio file after transcription
 
                         st.write("Transcription:")

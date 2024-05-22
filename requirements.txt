@@ -16,3 +16,4 @@ SpeechRecognition
 streamlit-player
 pydub
 ffmpeg
+moviepy

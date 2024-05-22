@@ -13,3 +13,4 @@ sacremoses
 accelerate
 torch
 SpeechRecognition
+pip install plotly

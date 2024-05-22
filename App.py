@@ -67,7 +67,7 @@ try:
     # Tab layout for file upload, text input, long text input, YouTube video input, YouTube videos by difficulty, and audio input
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
         ["Upload CSV", "Input Sentence", "Input Long Text", "YouTube Video URL", "YouTube Videos by Difficulty",
-         "Record or Upload Audio"])
+         "Upload Audio"])
 
     with tab1:
         st.header("Upload CSV File")

@@ -6,6 +6,7 @@ import traceback
 import warnings
 from pytube import YouTube
 import speech_recognition as sr
+from pydub import AudioSegment
 import os
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
@@ -59,6 +60,12 @@ def predict_difficulty(trainer, tokenizer, sentences):
 
     predicted_classes = predictions.argmax(axis=1)
     return predicted_classes
+
+def convert_audio_to_wav(audio_path):
+    audio = AudioSegment.from_file(audio_path)
+    wav_path = "converted_audio.wav"
+    audio.export(wav_path, format="wav")
+    return wav_path
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
@@ -149,10 +156,12 @@ try:
                         audio_stream = yt.streams.filter(only_audio=True).first()
                         audio_file = audio_stream.download(filename="audio.mp4")
 
+                        # Convert audio to WAV format
+                        wav_path = convert_audio_to_wav(audio_file)
+
                         # Transcribe audio to text
                         recognizer = sr.Recognizer()
-                        audio_path = "audio.mp4"
-                        with sr.AudioFile(audio_path) as source:
+                        with sr.AudioFile(wav_path) as source:
                             audio_data = recognizer.record(source)
                             transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
 
@@ -168,8 +177,10 @@ try:
                         st.error(f"Error processing video: {video_error}")
                         traceback.print_exc()
                     finally:
-                        if os.path.exists(audio_path):
-                            os.remove(audio_path)
+                        if os.path.exists(audio_file):
+                            os.remove(audio_file)
+                        if os.path.exists(wav_path):
+                            os.remove(wav_path)
             else:
                 st.error("Please enter a YouTube URL for prediction.")
 
@@ -188,13 +199,19 @@ try:
             with st.spinner('Transcribing audio...'):
                 try:
                     # Save the uploaded audio file
-                    audio_path = "uploaded_audio.wav"
-                    with open(audio_path, "wb") as f:
+                    uploaded_path = "uploaded_audio.wav"
+                    with open(uploaded_path, "wb") as f:
                         f.write(audio_file.getbuffer())
+
+                    # Convert audio to WAV format if necessary
+                    if not uploaded_path.endswith('.wav'):
+                        wav_path = convert_audio_to_wav(uploaded_path)
+                    else:
+                        wav_path = uploaded_path
 
                     # Transcribe audio to text
                     recognizer = sr.Recognizer()
-                    with sr.AudioFile(audio_path) as source:
+                    with sr.AudioFile(wav_path) as source:
                         audio_data = recognizer.record(source)
                         transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
 
@@ -211,8 +228,10 @@ try:
                     st.error(f"Error processing audio: {e}")
                     traceback.print_exc()
                 finally:
-                    if os.path.exists(audio_path):
-                        os.remove(audio_path)
+                    if os.path.exists(uploaded_path):
+                        os.remove(uploaded_path)
+                    if os.path.exists(wav_path) and wav_path != uploaded_path:
+                        os.remove(wav_path)
 
     with tab7:
         st.header("User Feedback")

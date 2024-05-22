@@ -11,12 +11,15 @@ import warnings
 from googleapiclient.discovery import build
 from nltk.corpus import stopwords
 import nltk
+import speech_recognition as sr
+import ffmpeg
 
 # Download the stopwords from nltk
 nltk.download('stopwords')
 
-youtube = build('youtube', 'v3', developerKey='AIzaSyCjlrdciGHFaCfRzDX-V8NbNH5mAs0vUgw')
-
+# Retrieve API key from Streamlit secrets
+youtube_api_key = st.secrets["YOUTUBE_API_KEY"]
+youtube = build('youtube', 'v3', developerKey=youtube_api_key)
 
 def search_youtube_videos(query, max_results=10):
     """Search videos on YouTube based on the query."""
@@ -181,10 +184,17 @@ try:
                         audio_stream = yt.streams.filter(only_audio=True).first()
                         audio_file = audio_stream.download(filename="audio.mp4")
 
+                        # Convert audio to WAV format using ffmpeg
+                        wav_file = "audio.wav"
+                        ffmpeg.input(audio_file).output(wav_file).run(overwrite_output=True)
+                        os.remove(audio_file)  # Remove original audio file
+
                         # Transcribe audio to text
-                        transcription = whisper_model.transcribe(audio_file)
-                        transcribed_text = transcription['text']
-                        os.remove(audio_file)  # Remove audio file after transcription
+                        recognizer = sr.Recognizer()
+                        with sr.AudioFile(wav_file) as source:
+                            audio_data = recognizer.record(source)
+                            transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
+                        os.remove(wav_file)  # Remove WAV file after transcription
 
                         st.write("Transcription:")
                         st.write(transcribed_text)
@@ -199,8 +209,7 @@ try:
                         predicted_class = predictions.argmax(axis=1)
                         predicted_difficulty = difficulty_mapping[predicted_class[0]]
 
-                        st.success(
-                            f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
+                        st.success(f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
                     except Exception as video_error:
                         st.error(f"Error processing video: {video_error}")
                         traceback.print_exc()

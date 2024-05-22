@@ -6,18 +6,10 @@ import traceback
 import warnings
 from pytube import YouTube
 import speech_recognition as sr
-from pydub import AudioSegment
 import os
 from googleapiclient.discovery import build
 from streamlit_player import st_player
-import subprocess
-
-# Check if ffmpeg is installed
-try:
-    subprocess.run(["ffmpeg", "-version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-except FileNotFoundError:
-    st.error("ffmpeg is not installed. Please install ffmpeg and try again.")
-    st.stop()
+import wave
 
 # Retrieve the API key from Streamlit secrets
 api_key = st.secrets["YOUTUBE_API_KEY"]
@@ -68,14 +60,8 @@ def predict_difficulty(trainer, tokenizer, sentences):
     return predicted_classes
 
 def convert_audio_to_wav(audio_path):
-    try:
-        audio = AudioSegment.from_file(audio_path)
-        wav_path = "converted_audio.wav"
-        audio.export(wav_path, format="wav")
-        return wav_path
-    except Exception as e:
-        st.error("Failed to convert audio to WAV format.")
-        raise e
+    # Assuming the audio is already in WAV format or can be directly read by Python's wave module
+    return audio_path
 
 def save_feedback(feedback_text, feedback_email):
     with open("feedback.txt", "a") as file:
@@ -120,7 +106,7 @@ try:
             if video_url:
                 video = YouTube(video_url)
                 video_stream = video.streams.filter(only_audio=True).first()
-                audio_path = video_stream.download(filename="video_audio.mp4")
+                audio_path = video_stream.download(filename="video_audio.wav")
                 wav_path = convert_audio_to_wav(audio_path)
                 recognizer = sr.Recognizer()
                 with sr.AudioFile(wav_path) as source:

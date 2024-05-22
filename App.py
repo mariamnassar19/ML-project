@@ -49,7 +49,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = '/Users/mariamnassar/Documents/Semester 2/Data science and machine learning/content/flaubert_finetuned_full'
+model_path =  "mn00/Flaubert"
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)

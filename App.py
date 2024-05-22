@@ -9,14 +9,12 @@ import speech_recognition as sr
 from pydub import AudioSegment
 import os
 from googleapiclient.discovery import build
-from dotenv import load_dotenv
 from streamlit_player import st_player
 
-# Load environment variables from .env file
-load_dotenv()
-api_key = os.getenv('YOUTUBE_API_KEY')
+# Retrieve the API key from Streamlit secrets
+api_key = st.secrets["YOUTUBE_API_KEY"]
 if not api_key:
-    st.error("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set.")
+    st.error("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set in Streamlit secrets.")
     st.stop()
 
 # Initialize the YouTube client
@@ -137,8 +135,11 @@ try:
         search_query = st.text_input("Enter search query")
         if st.button("Search Videos"):
             if search_query:
-                videos = search_youtube_videos(search_query)
-                display_video_results(videos)
+                try:
+                    videos = search_youtube_videos(search_query)
+                    display_video_results(videos)
+                except Exception as e:
+                    st.error(f"An error occurred: {str(e)}")
             else:
                 st.error("Please enter a search query")
 

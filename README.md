@@ -299,5 +299,12 @@ brew install ffmpeg
 # On Windows
 # Download from https://ffmpeg.org/download.html and add the `bin` directory to your system's PATH
 
+# 5. Conclusion
+
+Our project used machine learning to analyze the difficulty, topics, and core vocabulary of French texts from a personalized language learning perspective. We finally built an application to predict the French difficulty of the text, YouTube videos and recommend videos based on their difficulty levels We achieved our initial goals for the project。
+
+Throughout the project, we actively learned and practiced various methods for tokenization, feature extraction, and classification by using different models. In the competition, we optimized our code daily. Initially, we only managed to increase our accuracy by 0.02 each day, and both of our models plateaued at around 0.56. However, when Mariam suggested using an augmented dataset to obtain a new training dataset, our model's accuracy improved to over 0.60. Based on this improved model, Shiqi developed a simple UI that allows users to input CSV files and sentences to predict their difficulty. Mariam continued to enrich the UI's features, making it more engaging by predicting the difficulty of French YouTube videos and recommending videos based on their difficulty levels.
+
+Last but not least, it was a highly enjoyable and collaborative journey. We discussed and organized every part of the project together. When either of us felt nervous about the model’s low accuracy or when the code didn’t run, we encouraged each other. We tried to perfect our project as much as possible, and although we didn’t implement all our ideas due to time constraints, we were thrilled to finish second in the competition. Moreover, we truly enjoyed working together.😘❤️
 
 

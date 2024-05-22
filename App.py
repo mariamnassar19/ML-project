@@ -45,7 +45,7 @@ def display_video_results(videos):
         st_player(video_link)
 
 @st.cache_resource
-def load_model_and_tokenizer(model_name="mn00/Flaubert"):
+def load_model_and_tokenizer(model_name="mn00/trial"):
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
     trainer = Trainer(model=model)
@@ -57,6 +57,9 @@ def predict_difficulty(trainer, tokenizer, sentences):
     dataset = dataset.map(lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
     predictions = trainer.predict(dataset).predictions
+
+    # Debugging: Print raw predictions
+    st.write("Raw predictions:", predictions)
 
     predicted_classes = predictions.argmax(axis=1)
     return predicted_classes
@@ -71,7 +74,7 @@ def convert_audio_to_wav(audio_path):
 warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer from Hugging Face Hub
-model_name = "mn00/Flaubert"
+model_name = "mn00/trial"
 difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
 
 try:

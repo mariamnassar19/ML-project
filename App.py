@@ -21,13 +21,18 @@ nltk.download('stopwords')
 AudioSegment.converter = "/usr/local/bin/ffmpeg"  # Update this path to where ffmpeg is installed
 
 # Retrieve the API key from Streamlit secrets
-api_key = st.secrets["YOUTUBE_API_KEY"]
+api_key = st.secrets["youtube"]["api_key"]
 if not api_key:
     st.error("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set in Streamlit secrets.")
     st.stop()
 
 # Initialize the YouTube client
-youtube = build('youtube', 'v3', developerKey=api_key)
+try:
+    youtube = build('youtube', 'v3', developerKey=api_key)
+    st.success("YouTube API initialized successfully!")
+except Exception as e:
+    st.error(f"Failed to initialize YouTube API: {e}")
+    st.stop()
 
 def search_youtube_videos(query, max_results=10):
     """Search videos on YouTube based on the query."""
@@ -56,7 +61,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'shiqi-017/flaubert'
+model_path = 'models/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)

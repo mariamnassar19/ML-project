@@ -36,6 +36,10 @@ To address the challenges outlined previously, this project is divided into two 
 
 # 2. Data Preparation
 
+**Original Dataset**
+
+<img width="540" alt="截屏2024-05-21 20 22 32" src="https://github.com/mariamnassar19/ML-project/assets/150010028/3ea0bea0-2745-4c9b-a5da-80833fb0c96f">
+
 
 For LogoRank, effective data preparation is crucial for training our models to accurately predict the difficulty level of French texts. Below is an overview of our data preparation process:
 
@@ -52,6 +56,10 @@ To enhance the robustness of our models and increase the diversity of our traini
 The decision not to clean the data was based on an initial assessment which suggested that the dataset was already in good form without major inconsistencies or errors. This approach allowed us to focus our efforts on model training and refinement.
 
 Through this data preparation process, we aimed to create a training environment that mimics real-world applications, where the variety of text structures and contexts is vast. This method prepares our models to perform well across different styles and complexities of French texts.
+
+**Final Dataset**
+
+<img width="543" alt="截屏2024-05-21 20 22 18" src="https://github.com/mariamnassar19/ML-project/assets/150010028/67757ee3-3e27-47b1-82b4-1228f8bc7f12">
 
 # 3. Find the best model to predict the difficulty of French texts
 
@@ -90,7 +98,7 @@ We use `train_test_split` from `sklearn.model_selection` to divide the dataset i
 
 **First Training Run:**
 
-<img width="664" alt="截屏2024-05-22 01 21 48" src="https://github.com/mariamnassar19/ML-project/assets/150010028/8aa2db47-3d3c-4ecc-9d6d-5d4cdea38323">
+<img width="663" alt="截屏2024-05-22 02 02 21" src="https://github.com/mariamnassar19/ML-project/assets/150010028/a436b931-55a6-44d2-8533-c34ec8bbfc1d">
 
 - **Training Loss** significantly reduced from 1.2967 to 0.1319, indicating that the model effectively optimized its parameters and reduced errors during the learning process.
 
@@ -151,7 +159,9 @@ After extracting features, we use these features to test various pre-trained cla
 We have split the dataset into a training set (x_train and y_train) and a test set (x_test and y_test) in a 9:1 ratio. The target variables have been numerically encoded using LabelEncoder to represent the six difficulty levels: A1, A2, B1, B2, C1, and C2 as numbers 0 through 5.
 
 Additionally, we implemented an `evaluation` function to measure each model's effectiveness on the test set. This function calculates accuracy, precision, recall, and F1 scores to assess the models' overall accuracy, precision in identifying correct classifications, completeness of the positive predictions, and the balance between precision and recall. The comparison results are as follows:
-<img width="930" alt="截屏2024-05-21 15 54 10" src="https://github.com/mariamnassar19/ML-project/assets/150010028/1f95a852-654b-4038-ae30-a214f4f65747">
+
+<img width="926" alt="截屏2024-05-22 02 17 52" src="https://github.com/mariamnassar19/ML-project/assets/150010028/42b89e96-e91c-4562-b24a-add374ba0f94">
+
 
 ### 3.3.4 Discussion and Conclusion
 Despite our MLP model achieving high accuracy on our test set (approximately 0.8), its performance dropped significantly to 0.553 when predicting unlabeled test data in a Kaggle competition. Notably, other models also showed similar accuracy around 0.5 on Kaggle.

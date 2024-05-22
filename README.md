@@ -270,6 +270,7 @@ When running the application locally, you can take full advantage of all its fea
 - Full support for YouTube video processing and transcription.
 - Higher flexibility in handling large datasets.
 - Better performance for model inference and data visualization.
+  
 The code to run the app locally will bbe provided as AppLocal.py, it presents additional features like inputting URL for youtube videos to predict the difficulty.
 
 ### Deploying on Streamlit Cloud
@@ -277,7 +278,7 @@ Due to the constraints of deploying on Streamlit Cloud, some features needed to 
 
 - Feature Adjustments: Certain features like advanced video processing and transcription may be simplified or omitted.
 - Performance Optimization: The application is optimized to run within the resource limits of Streamlit Cloud.
-- 
+
 Despite these adjustments, the core functionality of the application remains robust, allowing users to predict text difficulty levels effectively.
 
 ## API Key Configuration

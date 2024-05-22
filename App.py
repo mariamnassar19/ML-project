@@ -12,6 +12,7 @@ import os
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
 import torch
+import numpy as np
 
 # Load environment variables from .env file
 load_dotenv()
@@ -50,7 +51,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer from Hugging Face Hub
-model_name = "flaubert/flaubert_base_cased"
+model_name = "mn00/Flaubert"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 @st.cache_resource
@@ -84,6 +85,12 @@ def preprocess_and_predict(data):
     
     predictions = trainer.predict(dataset).predictions
     predicted_classes = predictions.argmax(axis=1)
+    
+    # Detailed diagnostic information
+    st.write("Raw predictions shape:", predictions.shape)
+    st.write("Predictions (first 10):", predictions[:10])
+    st.write("Predicted classes (first 10):", predicted_classes[:10])
+    st.write("Prediction distribution:", np.bincount(predicted_classes, minlength=len(difficulty_mapping)))
     
     data['difficulty'] = [difficulty_mapping[i] for i in predicted_classes]
     return data

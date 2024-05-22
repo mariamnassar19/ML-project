@@ -326,5 +326,5 @@ Last but not least, it was a highly enjoyable and collaborative journey. We disc
 
 # 6. Youtube video URL:
 
-to access our youtube video, click on the following link: https://youtu.be/uzWqDLIkAwk 
+to access our youtube video, click on the following link: https://youtu.be/Grt0pQ9lC1M
 

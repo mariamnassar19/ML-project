@@ -52,7 +52,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'shiqi-017/flaubert'
+model_path = 'models/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
@@ -205,15 +205,16 @@ try:
 
     with tab6:
         st.header("Feedback")
-        feedback_text = st.text_area("Share your feedback:")
+        feedback_sentence = st.text_area("Enter a sentence:")
+        feedback_difficulty = st.selectbox("Select the difficulty level:", ('A1', 'A2', 'B1', 'B2', 'C1', 'C2'))
         feedback_email = st.text_input("Email (optional):")
         if st.button("Submit Feedback"):
-            if feedback_text:
+            if feedback_sentence and feedback_difficulty:
                 with open("feedback.txt", "a") as file:
-                    file.write(f"Email: {feedback_email if feedback_email else 'N/A'}, Feedback: {feedback_text}\n")
+                    file.write(f"Email: {feedback_email if feedback_email else 'N/A'}, Sentence: {feedback_sentence}, Difficulty: {feedback_difficulty}\n")
                 st.success("Thank you for your feedback!")
             else:
-                st.error("Please enter some feedback before submitting.")
+                st.error("Please enter a sentence and select a difficulty level before submitting.")
 
 except Exception as e:
     st.error("An error occurred: {}".format(str(e)))

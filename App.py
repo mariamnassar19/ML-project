@@ -9,17 +9,16 @@ import traceback
 import warnings
 from pytube import YouTube
 from googleapiclient.discovery import build
-import openai_whisper as whisper
+import whisper  # Changed from openai_whisper to whisper
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from .env file
 load_dotenv()
 api_key = os.getenv('YOUTUBE_API_KEY')
-
 if not api_key:
     raise ValueError("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set.")
-    
+
 # Initialize the YouTube client
 youtube = build('youtube', 'v3', developerKey=api_key)
 
@@ -50,14 +49,12 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'path_to_your_model/flaubert_finetuned_full'  # Update this with the correct path
+model_path = '/Users/mariamnassar/Documents/Semester 2/Data science and machine learning/content/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
     tokenizer = FlaubertTokenizer.from_pretrained(model_path)
     trainer = Trainer(model=model)
-    
-    # Whisper model for transcription
     whisper_model = whisper.load_model("base")
 
     # Difficulty mapping
@@ -226,7 +223,7 @@ try:
             display_video_results(videos)
 
     with tab6:
-        st.header("Record or Upload Audio")
+        st.header("Upload Audio")
         audio_file = st.file_uploader("Upload an audio file", type=["mp3", "wav"])
 
         if audio_file is not None:

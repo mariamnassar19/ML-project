@@ -11,25 +11,12 @@ import os
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
 from streamlit_player import st_player
-import subprocess
 
 # Load environment variables from .env file
 load_dotenv()
 api_key = os.getenv('YOUTUBE_API_KEY')
 if not api_key:
     st.error("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set.")
-    st.stop()
-
-# Check if FFmpeg is available
-def check_ffmpeg():
-    try:
-        subprocess.run(["ffmpeg", "-version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        return True
-    except subprocess.CalledProcessError:
-        return False
-
-if not check_ffmpeg():
-    st.error("FFmpeg is not installed or not found. Please install FFmpeg to process videos.")
     st.stop()
 
 # Initialize the YouTube client
@@ -54,7 +41,7 @@ def display_video_results(videos):
         st.write(f"Description: {video_description[:200]}...")
         st_player(video_link)
 
-@st.cache_resource
+@st.cache
 def load_model_and_tokenizer(model_name="mn00/trial"):
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
@@ -93,8 +80,6 @@ try:
     st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, or give feedback.')
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Upload CSV", "Input Sentence", "YouTube Video URL", "YouTube Videos by Difficulty", "Feedback"])
-
-    # Previous tabs remain unchanged
 
     with tab5:
         st.header("Feedback")

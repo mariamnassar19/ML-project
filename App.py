@@ -188,7 +188,8 @@ try:
                         audio_file = audio_stream.download(filename="audio.mp4")
 
                         # Transcribe audio to text
-                        transcription = whisper_model.transcribe(audio_file)
+                        model = whisper.load_model("base")
+                        transcription = model.transcribe(audio_file)
                         transcribed_text = transcription['text']
                         os.remove(audio_file)  # Remove audio file after transcription
 
@@ -230,7 +231,8 @@ try:
                     f.write(audio_file.getbuffer())
 
                 # Transcribe audio to text
-                transcription = whisper_model.transcribe("uploaded_audio.wav")
+                model = whisper.load_model("base")
+                transcription = model.transcribe("uploaded_audio.wav")
                 transcribed_text = transcription['text']
                 os.remove("uploaded_audio.wav")  # Remove audio file after transcription
 

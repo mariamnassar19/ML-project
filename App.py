@@ -17,7 +17,8 @@ from dotenv import load_dotenv
 load_dotenv()
 api_key = os.getenv('YOUTUBE_API_KEY')
 if not api_key:
-    raise ValueError("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set.")
+    st.error("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set.")
+    st.stop()
 
 # Initialize the YouTube client
 youtube = build('youtube', 'v3', developerKey=api_key)
@@ -209,7 +210,7 @@ try:
                             f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
                     except Exception as video_error:
                         st.error(f"Error processing video: {video_error}")
-                        traceback.print_exc()
+
             else:
                 st.error("Please enter a YouTube URL for prediction.")
 
@@ -253,5 +254,4 @@ try:
                     st.success(f'The predicted difficulty level for the transcribed audio is: {predicted_difficulty}')
 
 except Exception as e:
-    st.error("An error occurred: {}".format(str(e)))
-    traceback.print_exc()
+    st.error(f"An error occurred: {str(e)}")

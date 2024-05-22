@@ -1,3 +1,19 @@
+# Make sure to install required libraries
+import subprocess
+import sys
+
+# Function to install packages
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+# List of packages to install
+packages = ['plotly', 'transformers', 'datasets', 'matplotlib', 'seaborn', 'wordcloud', 'pytube', 'speechrecognition', 'google-api-python-client', 'python-dotenv', 'streamlit-player']
+
+# Install packages
+for package in packages:
+    install(package)
+
+# Import libraries
 import streamlit as st
 import pandas as pd
 from transformers import FlaubertTokenizer, FlaubertForSequenceClassification, Trainer
@@ -47,7 +63,7 @@ def display_video_results(videos):
         st.write(f"Description: {video_description[:200]}...")  # Show first 200 characters
         st_player(video_link)
 
-def load_model_and_tokenizer(model_name="mn00/trial"):
+def load_model_and_tokenizer(model_name="mn00/Flaubert"):
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
     trainer = Trainer(model=model)

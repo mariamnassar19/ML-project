@@ -62,10 +62,6 @@ def load_model():
 
 model, tokenizer, trainer = load_model()
 
-# Print model and tokenizer details
-st.write(f"Model: {model}")
-st.write(f"Tokenizer: {tokenizer}")
-
 # Difficulty mapping
 difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
 
@@ -88,10 +84,6 @@ def preprocess_and_predict(data):
     
     predictions = trainer.predict(dataset).predictions
     predicted_classes = predictions.argmax(axis=1)
-    
-    # Diagnostic information
-    st.write("Raw predictions:", predictions)
-    st.write("Predicted classes:", predicted_classes)
     
     data['difficulty'] = [difficulty_mapping[i] for i in predicted_classes]
     return data

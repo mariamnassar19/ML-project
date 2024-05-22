@@ -8,23 +8,18 @@ from wordcloud import WordCloud, STOPWORDS
 import traceback
 import warnings
 from pytube import YouTube
-import whisper
-import os
 from googleapiclient.discovery import build
-from nltk.corpus import stopwords
-import nltk
-import torch
+import openai_whisper as whisper
+import os
+from dotenv import load_dotenv
 
-# Download the stopwords from nltk
-nltk.download('stopwords')
+# Load environment variables
+load_dotenv()
+api_key = os.getenv('YOUTUBE_API_KEY')
 
-# Retrieve API key from Streamlit secrets
-try:
-    api_key = st.secrets["YOUTUBE_API_KEY"]
-except KeyError:
-    st.error("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set in Streamlit secrets.")
-    st.stop()
-
+if not api_key:
+    raise ValueError("API Key not found. Make sure the environment variable YOUTUBE_API_KEY is set.")
+    
 # Initialize the YouTube client
 youtube = build('youtube', 'v3', developerKey=api_key)
 
@@ -54,13 +49,15 @@ def display_video_results(videos):
 warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
-# Load the model and tokenizer from Hugging Face Hub
-model_name = "mn00/Flaubert"  # Replace with your model name on Hugging Face Hub
+# Load the model and tokenizer
+model_path = 'path_to_your_model/flaubert_finetuned_full'  # Update this with the correct path
 
 try:
-    model = FlaubertForSequenceClassification.from_pretrained(model_name)
-    tokenizer = FlaubertTokenizer.from_pretrained(model_name)
+    model = FlaubertForSequenceClassification.from_pretrained(model_path)
+    tokenizer = FlaubertTokenizer.from_pretrained(model_path)
     trainer = Trainer(model=model)
+    
+    # Whisper model for transcription
     whisper_model = whisper.load_model("base")
 
     # Difficulty mapping
@@ -73,7 +70,8 @@ try:
 
     # Tab layout for file upload, text input, long text input, YouTube video input, YouTube videos by difficulty, and audio input
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
-        ["Upload CSV", "Input Sentence", "Input Long Text", "YouTube Video URL", "YouTube Videos by Difficulty", "Record or Upload Audio"])
+        ["Upload CSV", "Input Sentence", "Input Long Text", "YouTube Video URL", "YouTube Videos by Difficulty",
+         "Record or Upload Audio"])
 
     with tab1:
         st.header("Upload CSV File")
@@ -87,7 +85,8 @@ try:
                     data['sentence'] = data['sentence'].astype(str)
                     dataset = Dataset.from_pandas(data)
                     dataset = dataset.map(
-                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
+                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
+                                                   max_length=512), batched=True)
                     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                     predictions = trainer.predict(dataset).predictions
                     predicted_classes = predictions.argmax(axis=1)
@@ -105,8 +104,9 @@ try:
                     # Generate and display word cloud with stopwords removed
                     st.subheader('Word Cloud of Sentences')
                     text = ' '.join(data['sentence'])
-                    french_stopwords = set(stopwords.words('french'))
-                    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=french_stopwords).generate(text)
+                    stopwords_fr = set(STOPWORDS)
+                    wordcloud = WordCloud(width=800, height=400, background_color='white',
+                                          stopwords=stopwords_fr).generate(text)
                     plt.figure(figsize=(10, 5))
                     plt.imshow(wordcloud, interpolation='bilinear')
                     plt.axis('off')
@@ -126,7 +126,8 @@ try:
                     # Process the sentence
                     dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [sentence]}))
                     dataset = dataset.map(
-                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
+                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
+                                                   max_length=512), batched=True)
                     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                     predictions = trainer.predict(dataset).predictions
                     predicted_class = predictions.argmax(axis=1)
@@ -144,13 +145,15 @@ try:
                 with st.spinner('Predicting...'):
                     # Split the long text into sentences (assuming sentences are separated by periods)
                     sentences = long_text.split('.')
-                    sentences = [sentence.strip() for sentence in sentences if sentence.strip()]  # Remove empty sentences
+                    sentences = [sentence.strip() for sentence in sentences if
+                                 sentence.strip()]  # Remove empty sentences
 
                     # Process and predict each sentence
                     data = pd.DataFrame({'sentence': sentences})
                     dataset = Dataset.from_pandas(data)
                     dataset = dataset.map(
-                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
+                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
+                                                   max_length=512), batched=True)
                     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                     predictions = trainer.predict(dataset).predictions
                     predicted_classes = predictions.argmax(axis=1)
@@ -168,8 +171,9 @@ try:
                     # Generate and display word cloud with stopwords removed
                     st.subheader('Word Cloud of Sentences')
                     text = ' '.join(data['sentence'])
-                    french_stopwords = set(stopwords.words('french'))
-                    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=french_stopwords).generate(text)
+                    stopwords_fr = set(STOPWORDS)
+                    wordcloud = WordCloud(width=800, height=400, background_color='white',
+                                          stopwords=stopwords_fr).generate(text)
                     plt.figure(figsize=(10, 5))
                     plt.imshow(wordcloud, interpolation='bilinear')
                     plt.axis('off')
@@ -188,8 +192,7 @@ try:
                         audio_file = audio_stream.download(filename="audio.mp4")
 
                         # Transcribe audio to text
-                        model = whisper.load_model("base")
-                        transcription = model.transcribe(audio_file)
+                        transcription = whisper_model.transcribe(audio_file)
                         transcribed_text = transcription['text']
                         os.remove(audio_file)  # Remove audio file after transcription
 
@@ -199,13 +202,15 @@ try:
                         # Process the transcribed text
                         dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [transcribed_text]}))
                         dataset = dataset.map(
-                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
+                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
+                                                       max_length=512), batched=True)
                         dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                         predictions = trainer.predict(dataset).predictions
                         predicted_class = predictions.argmax(axis=1)
                         predicted_difficulty = difficulty_mapping[predicted_class[0]]
 
-                        st.success(f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
+                        st.success(
+                            f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
                     except Exception as video_error:
                         st.error(f"Error processing video: {video_error}")
                         traceback.print_exc()
@@ -221,7 +226,7 @@ try:
             display_video_results(videos)
 
     with tab6:
-        st.header("Upload Audio")
+        st.header("Record or Upload Audio")
         audio_file = st.file_uploader("Upload an audio file", type=["mp3", "wav"])
 
         if audio_file is not None:
@@ -231,8 +236,7 @@ try:
                     f.write(audio_file.getbuffer())
 
                 # Transcribe audio to text
-                model = whisper.load_model("base")
-                transcription = model.transcribe("uploaded_audio.wav")
+                transcription = whisper_model.transcribe("uploaded_audio.wav")
                 transcribed_text = transcription['text']
                 os.remove("uploaded_audio.wav")  # Remove audio file after transcription
 
@@ -243,7 +247,8 @@ try:
                     # Process the transcribed text
                     dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [transcribed_text]}))
                     dataset = dataset.map(
-                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
+                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
+                                                   max_length=512), batched=True)
                     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                     predictions = trainer.predict(dataset).predictions
                     predicted_class = predictions.argmax(axis=1)

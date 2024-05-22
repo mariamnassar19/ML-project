@@ -71,7 +71,7 @@ def convert_audio_to_wav(audio_path):
 warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer from Hugging Face Hub
-model_name = "mn00/trial"
+model_name = "shiqi-017/flaubert"
 difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
 
 try:

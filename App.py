@@ -41,8 +41,12 @@ def display_video_results(videos):
         st.write(f"Description: {video_description[:200]}...")
         st_player(video_link)
 
-@st.cache
-def load_model_and_tokenizer(model_name="mn00/Flaubertmodel"):
+# Define a custom hash function for AddedToken
+def hash_added_token(token):
+    return hash((token.content, token.single_word, token.lstrip, token.rstrip, token.normalized, token.special))
+
+@st.cache(hash_funcs={AddedToken: hash_added_token})
+def load_model_and_tokenizer(model_name="shiqi-017/flaubert"):
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
     trainer = Trainer(model=model)
@@ -80,6 +84,63 @@ try:
     st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, or give feedback.')
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Upload CSV", "Input Sentence", "YouTube Video URL", "YouTube Videos by Difficulty", "Feedback"])
+
+    with tab1:
+        st.header("Upload CSV")
+        uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+        if uploaded_file is not None:
+            data = pd.read_csv(uploaded_file)
+            st.write(data.head())
+            sentences = data['sentence'].tolist()
+            predictions = predict_difficulty(trainer, tokenizer, sentences)
+            data['difficulty'] = [difficulty_mapping[p] for p in predictions]
+            st.write(data)
+
+    with tab2:
+        st.header("Input Sentence")
+        sentence = st.text_area("Enter a French sentence")
+        if st.button("Predict Difficulty"):
+            if sentence:
+                sentences = [sentence]
+                predictions = predict_difficulty(trainer, tokenizer, sentences)
+                st.write(f"The predicted difficulty is: {difficulty_mapping[predictions[0]]}")
+            else:
+                st.error("Please enter a sentence")
+
+    with tab3:
+        st.header("YouTube Video URL")
+        video_url = st.text_input("Enter YouTube video URL")
+        if st.button("Extract and Predict"):
+            if video_url:
+                video = YouTube(video_url)
+                video_stream = video.streams.filter(only_audio=True).first()
+                audio_path = video_stream.download(filename="video_audio.mp4")
+                wav_path = convert_audio_to_wav(audio_path)
+                recognizer = sr.Recognizer()
+                with sr.AudioFile(wav_path) as source:
+                    audio = recognizer.record(source)
+                try:
+                    text = recognizer.recognize_google(audio, language="fr-FR")
+                    sentences = [text]
+                    predictions = predict_difficulty(trainer, tokenizer, sentences)
+                    st.write(f"Transcribed text: {text}")
+                    st.write(f"The predicted difficulty is: {difficulty_mapping[predictions[0]]}")
+                except sr.UnknownValueError:
+                    st.error("Google Speech Recognition could not understand the audio")
+                except sr.RequestError as e:
+                    st.error(f"Could not request results from Google Speech Recognition service; {e}")
+            else:
+                st.error("Please enter a valid YouTube video URL")
+
+    with tab4:
+        st.header("YouTube Videos by Difficulty")
+        search_query = st.text_input("Enter search query")
+        if st.button("Search Videos"):
+            if search_query:
+                videos = search_youtube_videos(search_query)
+                display_video_results(videos)
+            else:
+                st.error("Please enter a search query")
 
     with tab5:
         st.header("Feedback")

@@ -42,7 +42,7 @@ def display_video_results(videos):
         st_player(video_link)
 
 @st.cache
-def load_model_and_tokenizer(model_name="mn00/trial"):
+def load_model_and_tokenizer(model_name="shiqi-017/flaubert"):
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
     trainer = Trainer(model=model)

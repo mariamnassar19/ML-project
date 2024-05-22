@@ -264,7 +264,18 @@ To run the app locally, follow these steps:
 
 ![image](https://github.com/mariamnassar19/ML-project/assets/145570066/5b326c7f-ef2f-4ea0-b00a-5eba812465e3)
 
+# Running Locally vs. Deploying on Streamlit Cloud
+### Running Locally
+When running the application locally, you can take full advantage of all its features. The local environment allows for better performance and the inclusion of more resource-intensive features. This includes:
 
+Full support for YouTube video processing and transcription.
+Higher flexibility in handling large datasets.
+Better performance for model inference and data visualization.
+### Deploying on Streamlit Cloud
+Due to the constraints of deploying on Streamlit Cloud, some features needed to be adjusted or removed to ensure smooth operation and compliance with resource limits:
+-Feature Adjustments: Certain features like advanced video processing and transcription may be simplified or omitted.
+-Performance Optimization: The application is optimized to run within the resource limits of Streamlit Cloud.
+Despite these adjustments, the core functionality of the application remains robust, allowing users to predict text difficulty levels effectively.
 
 ## API Key Configuration
 

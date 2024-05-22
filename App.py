@@ -1,26 +1,7 @@
-# Make sure to install required libraries
-import subprocess
-import sys
-
-# Function to install packages
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-# List of packages to install
-packages = ['plotly', 'transformers', 'datasets', 'matplotlib', 'seaborn', 'wordcloud', 'pytube', 'speechrecognition', 'google-api-python-client', 'python-dotenv', 'streamlit-player']
-
-# Install packages
-for package in packages:
-    install(package)
-
-# Import libraries
 import streamlit as st
 import pandas as pd
 from transformers import FlaubertTokenizer, FlaubertForSequenceClassification, Trainer
 from datasets import Dataset
-import matplotlib.pyplot as plt
-import seaborn as sns
-from wordcloud import WordCloud, STOPWORDS
 import traceback
 import warnings
 from pytube import YouTube
@@ -28,7 +9,6 @@ import speech_recognition as sr
 import os
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
-import plotly.express as px
 from streamlit_player import st_player
 
 # Load environment variables from .env file
@@ -63,6 +43,7 @@ def display_video_results(videos):
         st.write(f"Description: {video_description[:200]}...")  # Show first 200 characters
         st_player(video_link)
 
+@st.cache_resource
 def load_model_and_tokenizer(model_name="mn00/Flaubert"):
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
@@ -76,64 +57,8 @@ def predict_difficulty(trainer, tokenizer, sentences):
     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
     predictions = trainer.predict(dataset).predictions
 
-    # Print raw predictions for debugging
-    st.write("Raw Predictions:", predictions)
-
     predicted_classes = predictions.argmax(axis=1)
-
-    # Print confidence scores for each class for debugging
-    confidence_scores = predictions.softmax(axis=1)
-    st.write("Confidence Scores:", confidence_scores)
-
     return predicted_classes
-
-def display_predictions(data, difficulty_mapping):
-    st.dataframe(data[['sentence', 'difficulty']])
-
-    # Display prediction distribution with Plotly
-    st.subheader('Prediction Distribution')
-    fig = px.histogram(data, x='difficulty', category_orders={'difficulty': list(difficulty_mapping.values())})
-    st.plotly_chart(fig)
-
-    # Generate and display word cloud with stopwords removed
-    st.subheader('Word Cloud of Sentences')
-    text = ' '.join(data['sentence'])
-    stopwords = set(STOPWORDS).union({"de", "la", "le", "et", "les", "des", "du", "un", "une"})  # Add common French stopwords
-    wordcloud = WordCloud(width=800, height=400, background_color='white', stopwords=stopwords).generate(text)
-    plt.figure(figsize=(10, 5))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    st.pyplot()
-
-    st.download_button(label='Download Predictions', data=data.to_csv(index=False).encode('utf-8'), file_name='predicted_difficulties.csv', mime='text/csv')
-
-def process_youtube_audio(youtube_url):
-    yt = YouTube(youtube_url)
-    audio_stream = yt.streams.filter(only_audio=True).first()
-    audio_file = audio_stream.download(filename="audio.mp4")
-
-    # Transcribe audio to text
-    recognizer = sr.Recognizer()
-    with sr.AudioFile("audio.mp4") as source:
-        audio_data = recognizer.record(source)
-        transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
-    
-    os.remove("audio.mp4")  # Clean up audio file after processing
-    return transcribed_text
-
-def process_uploaded_audio(audio_file):
-    # Save the uploaded audio file
-    with open("uploaded_audio.wav", "wb") as f:
-        f.write(audio_file.getbuffer())
-
-    # Transcribe audio to text
-    recognizer = sr.Recognizer()
-    with sr.AudioFile("uploaded_audio.wav") as source:
-        audio_data = recognizer.record(source)
-        transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
-
-    os.remove("uploaded_audio.wav")  # Clean up audio file after processing
-    return transcribed_text
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
@@ -168,7 +93,9 @@ try:
                         data['difficulty'] = [difficulty_mapping[i] for i in predicted_classes]
 
                         st.write('Predictions complete!')
-                        display_predictions(data, difficulty_mapping)
+                        st.dataframe(data[['sentence', 'difficulty']])
+
+                        st.download_button(label='Download Predictions', data=data.to_csv(index=False).encode('utf-8'), file_name='predicted_difficulties.csv', mime='text/csv')
                 else:
                     st.error('Uploaded file does not contain required "sentence" column.')
             except Exception as e:
@@ -206,7 +133,7 @@ try:
                         data = pd.DataFrame({'sentence': sentences, 'difficulty': [difficulty_mapping[i] for i in predicted_classes]})
 
                         st.write('Predictions complete!')
-                        display_predictions(data, difficulty_mapping)
+                        st.dataframe(data[['sentence', 'difficulty']])
                     except Exception as e:
                         st.error(f"An error occurred during prediction: {str(e)}")
 
@@ -217,17 +144,32 @@ try:
             if youtube_url:
                 with st.spinner('Processing YouTube video...'):
                     try:
-                        transcribed_text = process_youtube_audio(youtube_url)
+                        # Download the YouTube video
+                        yt = YouTube(youtube_url)
+                        audio_stream = yt.streams.filter(only_audio=True).first()
+                        audio_file = audio_stream.download(filename="audio.mp4")
+
+                        # Transcribe audio to text
+                        recognizer = sr.Recognizer()
+                        audio_path = "audio.mp4"
+                        with sr.AudioFile(audio_path) as source:
+                            audio_data = recognizer.record(source)
+                            transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
+
                         st.write("Transcription:")
                         st.write(transcribed_text)
 
-                        with st.spinner('Predicting difficulty...'):
-                            predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
-                            predicted_difficulty = difficulty_mapping[predicted_classes[0]]
-                            st.success(f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
+                        # Process the transcribed text
+                        predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
+                        predicted_difficulty = difficulty_mapping[predicted_classes[0]]
+
+                        st.success(f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
                     except Exception as video_error:
                         st.error(f"Error processing video: {video_error}")
                         traceback.print_exc()
+                    finally:
+                        if os.path.exists(audio_path):
+                            os.remove(audio_path)
             else:
                 st.error("Please enter a YouTube URL for prediction.")
 
@@ -245,17 +187,32 @@ try:
         if audio_file is not None:
             with st.spinner('Transcribing audio...'):
                 try:
-                    transcribed_text = process_uploaded_audio(audio_file)
+                    # Save the uploaded audio file
+                    audio_path = "uploaded_audio.wav"
+                    with open(audio_path, "wb") as f:
+                        f.write(audio_file.getbuffer())
+
+                    # Transcribe audio to text
+                    recognizer = sr.Recognizer()
+                    with sr.AudioFile(audio_path) as source:
+                        audio_data = recognizer.record(source)
+                        transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
+
                     st.write("Transcription:")
                     st.write(transcribed_text)
 
                     with st.spinner('Predicting difficulty...'):
+                        # Process the transcribed text
                         predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
                         predicted_difficulty = difficulty_mapping[predicted_classes[0]]
+
                         st.success(f'The predicted difficulty level for the transcribed audio is: {predicted_difficulty}')
                 except Exception as e:
                     st.error(f"Error processing audio: {e}")
                     traceback.print_exc()
+                finally:
+                    if os.path.exists(audio_path):
+                        os.remove(audio_path)
 
     with tab7:
         st.header("User Feedback")

@@ -11,8 +11,6 @@ import speech_recognition as sr
 import os
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
-import plotly.express as px
-from streamlit_player import st_player
 import torch
 
 # Load environment variables from .env file
@@ -112,10 +110,11 @@ try:
                         st.write('Predictions complete!')
                         st.dataframe(data[['sentence', 'difficulty']])
 
-                        # Display prediction distribution with Plotly
+                        # Display prediction distribution with seaborn
                         st.subheader('Prediction Distribution')
-                        fig = px.histogram(data, x='difficulty', category_orders={'difficulty': list(difficulty_mapping.values())})
-                        st.plotly_chart(fig)
+                        fig, ax = plt.subplots()
+                        sns.countplot(x='difficulty', data=data, order=list(difficulty_mapping.values()), ax=ax)
+                        st.pyplot(fig)
 
                         # Generate and display word cloud with stopwords removed
                         st.subheader('Word Cloud of Sentences')
@@ -170,10 +169,11 @@ try:
                         st.write('Predictions complete!')
                         st.dataframe(data[['sentence', 'difficulty']])
 
-                        # Display prediction distribution with Plotly
+                        # Display prediction distribution with seaborn
                         st.subheader('Prediction Distribution')
-                        fig = px.histogram(data, x='difficulty', category_orders={'difficulty': list(difficulty_mapping.values())})
-                        st.plotly_chart(fig)
+                        fig, ax = plt.subplots()
+                        sns.countplot(x='difficulty', data=data, order=list(difficulty_mapping.values()), ax=ax)
+                        st.pyplot(fig)
 
                         # Generate and display word cloud with stopwords removed
                         st.subheader('Word Cloud of Sentences')

@@ -220,9 +220,9 @@ try:
             display_video_results(videos)
 
     with tab6:
-        st.header("Record or Upload Audio")
+        st.header("Upload Audio")
         audio_file = st.file_uploader("Upload an audio file", type=["mp3", "wav"])
-        
+
         if audio_file is not None:
             with st.spinner('Transcribing audio...'):
                 # Save the uploaded audio file
@@ -248,6 +248,7 @@ try:
                     predicted_difficulty = difficulty_mapping[predicted_class[0]]
 
                     st.success(f'The predicted difficulty level for the transcribed audio is: {predicted_difficulty}')
+
 except Exception as e:
-    st.error(f"An error occurred: {str(e)}")
+    st.error("An error occurred: {}".format(str(e)))
     traceback.print_exc()

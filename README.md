@@ -324,4 +324,7 @@ Throughout the project, we actively learned and practiced various methods for to
 
 Last but not least, it was a highly enjoyable and collaborative journey. We discussed and organized every part of the project together. When either of us felt nervous about the model’s low accuracy or when the code didn’t run, we encouraged each other. We tried to perfect our project as much as possible, and although we didn’t implement all our ideas due to time constraints, we were thrilled to finish second in the competition. Moreover, we truly enjoyed working together.😘❤️
 
+# 6. Youtube video URL:
+
+to access our youtube video, click on the following link: https://youtu.be/uzWqDLIkAwk 
 

@@ -48,7 +48,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'shiqi-017/flaubert'
+model_path = '/Users/mariamnassar/Documents/Semester 2/Data science and machine learning/project model/content/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
@@ -57,6 +57,10 @@ try:
 
     # Difficulty mapping
     difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
+
+    # Initialize an empty DataFrame to store feedback
+    if 'feedback_data' not in st.session_state:
+        st.session_state.feedback_data = pd.DataFrame(columns=['sentence', 'difficulty'])
 
     # Define the Streamlit layout
     st.title('Text Difficulty Prediction App')
@@ -226,12 +230,27 @@ try:
 
     with tab6:
         st.header("Feedback")
-        feedback_text = st.text_area("Please provide your feedback here:")
+        feedback_sentence = st.text_area("Please provide a sentence for feedback:")
+        feedback_difficulty = st.selectbox("Select the difficulty level:", ('A1', 'A2', 'B1', 'B2', 'C1', 'C2'))
+
         if st.button("Submit Feedback"):
-            if feedback_text:
+            if feedback_sentence:
+                # Add feedback to session state DataFrame
+                new_feedback = pd.DataFrame([[feedback_sentence, feedback_difficulty]], columns=['sentence', 'difficulty'])
+                st.session_state.feedback_data = pd.concat([st.session_state.feedback_data, new_feedback], ignore_index=True)
+
                 st.success("Thank you for your feedback!")
+                st.dataframe(st.session_state.feedback_data)
+                
+                # Option to download feedback
+                st.download_button(
+                    label="Download Feedback Data",
+                    data=st.session_state.feedback_data.to_csv(index=False).encode('utf-8'),
+                    file_name='feedback_data.csv',
+                    mime='text/csv'
+                )
             else:
-                st.error("Please enter your feedback before submitting.")
+                st.error("Please enter a sentence for feedback before submitting.")
 
 except Exception as e:
     st.error("An error occurred: {}".format(str(e)))

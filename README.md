@@ -1,3 +1,4 @@
+
 # ML-project
 # Predicting french text difficulty level
 # 1.  Project Overview
@@ -286,6 +287,17 @@ To set up your YouTube API key, you can either hardcode your API key, or follow 
      api_key = os.getenv('YOUTUBE_API_KEY')
      ```
 
+
+# Ensure ffmpeg is installed
+# On Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install ffmpeg
+
+# On macOS (using Homebrew)
+brew install ffmpeg
+
+# On Windows
+# Download from https://ffmpeg.org/download.html and add the `bin` directory to your system's PATH
 
 
 

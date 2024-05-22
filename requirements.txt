@@ -6,10 +6,9 @@ matplotlib
 seaborn
 wordcloud
 pytube
-whisper @ git+https://github.com/openai/whisper.git
+openai-whisper
 google-api-python-client
 nltk
 python-dotenv
 torch
 sacremoses
-accelerate>=0.21.0

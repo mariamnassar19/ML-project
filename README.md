@@ -263,6 +263,22 @@ To run the app locally, follow these steps:
 - `ffmpeg-python`
 
 ![image](https://github.com/mariamnassar19/ML-project/assets/145570066/5b326c7f-ef2f-4ea0-b00a-5eba812465e3)
+## Usage
+### Upload CSV
+Users upload a CSV file. The sentences are tokenized and processed. The app reads the file, processes the sentences, predicts their difficulty levels, and displays the results in a table. Additionally, a word cloud and a distribution plot of the difficulty levels are generated.
+  
+### Input Sentence
+Users enter a French sentence in a text area. The input sentence is tokenized and processed, and the model predicts the difficulty level.
+
+### Input Long Text
+Users enter a long text in a text area. The app splits the text into individual sentences, processes each sentence, predicts their difficulty levels, and displays the results in a table. A word cloud and a distribution plot of the difficulty levels are also generated.
+
+### Find YouTube Videos by Difficulty
+Users select a difficulty level from a dropdown menu and click the search button. The app queries YouTube
+((search_youtube_videos(query)) for videos related to French lessons at the selected difficulty level and displays the results with video titles, descriptions, and links to watch the videos.
+
+### Feedback
+Users enter a sentence and select its difficulty level from a dropdown menu. The app stores the feedback in a DataFrame, displays it, and provides an option to download the feedback data as a CSV file.
 
 ## Running Locally vs. Deploying on Streamlit Cloud
 ### Running Locally

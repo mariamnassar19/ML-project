@@ -200,7 +200,7 @@ Our findings emphasize the importance of ongoing evaluation and adaptation in ma
 In conclusion, choosing the FlaubertForSequenceClassification model over the Camembert approach marks a strategic pivot towards practical deployment scenarios. This decision highlights the need for flexibility in model selection within the dynamic field of AI and machine learning;)
 
 
-# Mon Ami Français
+# 4. Mon Ami Français
 
 Mon Ami Français is a Streamlit web application that predicts the difficulty level of French sentences. The application leverages the Flaubert model from Hugging Face to analyze and categorize text into different levels of difficulty (A1, A2, B1, B2, C1, C2). Users can upload a CSV file, input sentences directly, or input long texts such as song lyrics. Additionally, the app allows users to find YouTube videos by difficulty level and provide feedback on sentence difficulty.
 

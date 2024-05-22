@@ -1,6 +1,6 @@
 streamlit
 pandas
-transformers
+transformers[torch]
 datasets
 matplotlib
 seaborn
@@ -10,6 +10,7 @@ whisper
 google-api-python-client
 nltk
 python-dotenv
-torch
 sacremoses
+accelerate
+torch  # Ensure torch is included to handle PyTorch dependencies
 

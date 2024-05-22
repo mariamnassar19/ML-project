@@ -51,7 +51,6 @@ warnings.filterwarnings("ignore",
 
 # Load the model and tokenizer
 model_path = 'shiqi-017/flaubert'
-
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
     tokenizer = FlaubertTokenizer.from_pretrained(model_path)
@@ -192,7 +191,6 @@ try:
 
                         # Convert audio to WAV format using ffmpeg
                         wav_file = "audio.wav"
-                        ffmpeg.input(audio_file).output(wav_file).                        
                         ffmpeg.input(audio_file).output(wav_file).run(overwrite_output=True)
                         os.remove(audio_file)  # Remove original audio file
 
@@ -258,5 +256,3 @@ try:
 except Exception as e:
     st.error("An error occurred: {}".format(str(e)))
     traceback.print_exc()
-
-

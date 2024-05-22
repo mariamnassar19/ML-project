@@ -158,7 +158,7 @@ try:
                     finally:
                         if os.path.exists(audio_file):
                             os.remove(audio_file)
-                        if os.path.exists(wav_path):
+                        if 'wav_path' in locals() and os.path.exists(wav_path):
                             os.remove(wav_path)
             else:
                 st.error("Please enter a YouTube URL for prediction.")

@@ -15,5 +15,6 @@ torch
 SpeechRecognition
 streamlit-player
 pydub
-ffmpeg
 moviepy
+pyaudio
+ffmpeg-python

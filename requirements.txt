@@ -14,3 +14,4 @@ accelerate
 torch
 SpeechRecognition
 streamlit-player
+pydub

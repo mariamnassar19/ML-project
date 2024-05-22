@@ -58,9 +58,6 @@ def predict_difficulty(trainer, tokenizer, sentences):
     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
     predictions = trainer.predict(dataset).predictions
 
-    # Debugging: Print raw predictions
-    st.write("Raw predictions:", predictions)
-
     predicted_classes = predictions.argmax(axis=1)
     return predicted_classes
 
@@ -82,11 +79,10 @@ try:
 
     # Define the Streamlit layout
     st.title('Text Difficulty Prediction App')
-    st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, record audio, or input long texts such as song lyrics.')
+    st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, or provide a YouTube video URL.')
 
-    # Tab layout for file upload, text input, long text input, YouTube video input, YouTube videos by difficulty, and audio input
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
-        ["Upload CSV", "Input Sentence", "Input Long Text", "YouTube Video URL", "YouTube Videos by Difficulty", "Record or Upload Audio", "User Feedback"])
+    # Tab layout for file upload, text input, YouTube video input, and YouTube videos by difficulty
+    tab1, tab2, tab3, tab4 = st.tabs(["Upload CSV", "Input Sentence", "YouTube Video URL", "YouTube Videos by Difficulty"])
 
     with tab1:
         st.header("Upload CSV File")
@@ -128,26 +124,6 @@ try:
                 st.error("Please enter a sentence for prediction.")
 
     with tab3:
-        st.header("Input Long Text")
-        long_text = st.text_area("Enter the text here (e.g., song lyrics, paragraphs). ", height=300)
-        if st.button("Predict Difficulty for Long Text"):
-            if long_text:
-                with st.spinner('Predicting...'):
-                    try:
-                        # Split the long text into sentences (assuming sentences are separated by periods)
-                        sentences = long_text.split('.')
-                        sentences = [sentence.strip() for sentence in sentences if sentence.strip()]  # Remove empty sentences
-
-                        # Process and predict each sentence
-                        predicted_classes = predict_difficulty(trainer, tokenizer, sentences)
-                        data = pd.DataFrame({'sentence': sentences, 'difficulty': [difficulty_mapping[i] for i in predicted_classes]})
-
-                        st.write('Predictions complete!')
-                        st.dataframe(data[['sentence', 'difficulty']])
-                    except Exception as e:
-                        st.error(f"An error occurred during prediction: {str(e)}")
-
-    with tab4:
         st.header("YouTube Video URL")
         youtube_url = st.text_input("Enter YouTube URL here:")
         if st.button("Predict Difficulty from Video"):
@@ -182,75 +158,18 @@ try:
                     finally:
                         if os.path.exists(audio_file):
                             os.remove(audio_file)
-                        if 'wav_path' in locals() and os.path.exists(wav_path):
+                        if os.path.exists(wav_path):
                             os.remove(wav_path)
             else:
                 st.error("Please enter a YouTube URL for prediction.")
 
-    with tab5:
+    with tab4:
         st.header("Find YouTube Videos by Difficulty")
         difficulty_level = st.selectbox("Select the difficulty level:", ('A1', 'A2', 'B1', 'B2', 'C1', 'C2'), index=2)
         if st.button('Search Videos'):
             query = f"French lessons {difficulty_level}"  # Customize query based on difficulty
             videos = search_youtube_videos(query)
             display_video_results(videos)
-
-    with tab6:
-        st.header("Record or Upload Audio")
-        audio_file = st.file_uploader("Upload an audio file", type=["mp3", "wav"])
-        if audio_file is not None:
-            with st.spinner('Transcribing audio...'):
-                try:
-                    # Save the uploaded audio file
-                    uploaded_path = "uploaded_audio.wav"
-                    with open(uploaded_path, "wb") as f:
-                        f.write(audio_file.getbuffer())
-
-                    # Convert audio to WAV format if necessary
-                    if not uploaded_path.endswith('.wav'):
-                        wav_path = convert_audio_to_wav(uploaded_path)
-                    else:
-                        wav_path = uploaded_path
-
-                    # Transcribe audio to text
-                    recognizer = sr.Recognizer()
-                    with sr.AudioFile(wav_path) as source:
-                        audio_data = recognizer.record(source)
-                        transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
-
-                    st.write("Transcription:")
-                    st.write(transcribed_text)
-
-                    with st.spinner('Predicting difficulty...'):
-                        # Process the transcribed text
-                        predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
-                        predicted_difficulty = difficulty_mapping[predicted_classes[0]]
-
-                        st.success(f'The predicted difficulty level for the transcribed audio is: {predicted_difficulty}')
-                except Exception as e:
-                    st.error(f"Error processing audio: {e}")
-                    traceback.print_exc()
-                finally:
-                    if os.path.exists(uploaded_path):
-                        os.remove(uploaded_path)
-                    if 'wav_path' in locals() and os.path.exists(wav_path):
-                        os.remove(wav_path)
-
-    with tab7:
-        st.header("User Feedback")
-        feedback_sentence = st.text_area("Enter a sentence and its difficulty level for feedback:")
-        feedback_difficulty = st.selectbox("Select the difficulty level:", ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
-        if st.button("Submit Feedback"):
-            if feedback_sentence and feedback_difficulty:
-                try:
-                    with open("feedback.csv", "a") as f:
-                        f.write(f"{feedback_sentence},{feedback_difficulty}\n")
-                    st.success("Thank you for your feedback!")
-                except Exception as e:
-                    st.error(f"An error occurred while saving feedback: {str(e)}")
-                    traceback.print_exc()
-            else:
-                st.error("Please enter a sentence and select a difficulty level.")
 
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")

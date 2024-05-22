@@ -9,7 +9,7 @@ import traceback
 import warnings
 from pytube import YouTube
 from googleapiclient.discovery import build
-import whisper
+import speech_recognition as sr
 import os
 from dotenv import load_dotenv
 
@@ -55,7 +55,6 @@ try:
     model = FlaubertForSequenceClassification.from_pretrained(model_name)
     tokenizer = FlaubertTokenizer.from_pretrained(model_name)
     trainer = Trainer(model=model)
-    whisper_model = whisper.load_model("base")
 
     # Difficulty mapping
     difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
@@ -189,8 +188,11 @@ try:
                         audio_file = audio_stream.download(filename="audio.mp4")
 
                         # Transcribe audio to text
-                        transcription = whisper_model.transcribe(audio_file)
-                        transcribed_text = transcription['text']
+                        recognizer = sr.Recognizer()
+                        audio_path = "audio.mp4"
+                        with sr.AudioFile(audio_path) as source:
+                            audio_data = recognizer.record(source)
+                            transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
                         os.remove(audio_file)  # Remove audio file after transcription
 
                         st.write("Transcription:")
@@ -233,8 +235,10 @@ try:
                     f.write(audio_file.getbuffer())
 
                 # Transcribe audio to text
-                transcription = whisper_model.transcribe("uploaded_audio.wav")
-                transcribed_text = transcription['text']
+                recognizer = sr.Recognizer()
+                with sr.AudioFile("uploaded_audio.wav") as source:
+                    audio_data = recognizer.record(source)
+                    transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
                 os.remove("uploaded_audio.wav")  # Remove audio file after transcription
 
                 st.write("Transcription:")

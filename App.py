@@ -5,7 +5,6 @@ from transformers import FlaubertTokenizer, FlaubertForSequenceClassification, T
 from datasets import Dataset
 import matplotlib.pyplot as plt
 import seaborn as sns
-from wordcloud import WordCloud
 import traceback
 import warnings
 from pytube import YouTube
@@ -53,7 +52,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'shiqi-017/flaubert'
+model_path = 'models/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
@@ -99,17 +98,6 @@ try:
                     fig, ax = plt.subplots()
                     sns.countplot(x='difficulty', data=data, order=difficulty_mapping.values(), ax=ax)
                     st.pyplot(fig)
-
-                    # Generate and display word cloud with stopwords removed
-                    st.subheader('Word Cloud of Sentences')
-                    text = ' '.join(data['sentence'])
-                    french_stopwords = set(stopwords.words('french'))
-                    wordcloud = WordCloud(width=800, height=400, background_color='white',
-                                          stopwords=french_stopwords).generate(text)
-                    plt.figure(figsize=(10, 5))
-                    plt.imshow(wordcloud, interpolation='bilinear')
-                    plt.axis('off')
-                    st.pyplot()
 
                     st.download_button(label='Download Predictions', data=data.to_csv(index=False).encode('utf-8'),
                                        file_name='predicted_difficulties.csv', mime='text/csv')
@@ -165,17 +153,6 @@ try:
                     fig, ax = plt.subplots()
                     sns.countplot(x='difficulty', data=data, order=difficulty_mapping.values(), ax=ax)
                     st.pyplot(fig)
-
-                    # Generate and display word cloud with stopwords removed
-                    st.subheader('Word Cloud of Sentences')
-                    text = ' '.join(data['sentence'])
-                    french_stopwords = set(stopwords.words('french'))
-                    wordcloud = WordCloud(width=800, height=400, background_color='white',
-                                          stopwords=french_stopwords).generate(text)
-                    plt.figure(figsize=(10, 5))
-                    plt.imshow(wordcloud, interpolation='bilinear')
-                    plt.axis('off')
-                    st.pyplot()
 
     with tab4:
         st.header("YouTube Video URL")

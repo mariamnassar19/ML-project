@@ -210,9 +210,8 @@ This Streamlit application predicts the difficulty level of French sentences. It
 1. **Upload CSV**: Upload a CSV file containing French sentences for batch processing.
 2. **Input Sentence**: Enter a single French sentence for difficulty prediction.
 3. **Input Long Text**: Input long French texts, such as song lyrics or paragraphs, for sentence-wise difficulty prediction.
-4. **YouTube Video URL**: Provide a YouTube video URL to transcribe its audio and predict the difficulty of the transcribed text.
-5. **Find YouTube Videos by Difficulty**: Select a difficulty level to get suggested YouTube videos appropriate for that level.
-6. **Record or Upload Audio**: Upload an audio file to transcribe and predict the difficulty of the transcribed text.
+4. **Find YouTube Videos by Difficulty**: Select a difficulty level to get suggested YouTube videos appropriate for that level.
+5. **Record or Upload Audio**: Upload an audio file to transcribe and predict the difficulty of the transcribed text.
 
 ## Installation
 

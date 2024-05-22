@@ -25,12 +25,8 @@ if not api_key:
 youtube = build('youtube', 'v3', developerKey=api_key)
 
 # Download and cache French stopwords
-@st.cache(show_spinner=False)
-def load_stopwords():
-    nltk.download('stopwords')
-    return set(nltk.corpus.stopwords.words('french'))
-
-french_stopwords = load_stopwords()
+nltk.download('stopwords')
+french_stopwords = set(nltk.corpus.stopwords.words('french'))
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")

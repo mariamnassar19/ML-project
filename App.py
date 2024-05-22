@@ -9,7 +9,7 @@ import traceback
 import warnings
 from pytube import YouTube
 from googleapiclient.discovery import build
-import whisper
+import openai_whisper as whisper
 import os
 from dotenv import load_dotenv
 

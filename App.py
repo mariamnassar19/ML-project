@@ -51,7 +51,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer from Hugging Face Hub
-model_name = "mn00/Flaubert"
+model_name = "mn00/FlaubertUse"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 @st.cache_resource

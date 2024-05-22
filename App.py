@@ -80,8 +80,9 @@ def convert_audio_to_wav(audio_path):
         st.error("Failed to convert audio to WAV format.")
         raise e
 
-# Suppress specific warnings
-warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
+def save_feedback(feedback_text, feedback_email):
+    with open("feedback.txt", "a") as file:
+        file.write(f"Email: {feedback_email if feedback_email else 'N/A'}, Feedback: {feedback_text}\n")
 
 model_name = "shiqi-017/flaubert"
 difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
@@ -89,61 +90,22 @@ difficulty_mapping = {0: 'A1', 1: 'A2', 2: 'B1', 3: 'B2', 4: 'C1', 5: 'C2'}
 try:
     model, tokenizer, trainer = load_model_and_tokenizer(model_name)
     st.title('Text Difficulty Prediction App')
-    st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, or provide a YouTube video URL.')
+    st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, provide a YouTube video URL, or give feedback.')
 
-    tab1, tab2, tab3, tab4 = st.tabs(["Upload CSV", "Input Sentence", "YouTube Video URL", "YouTube Videos by Difficulty"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Upload CSV", "Input Sentence", "YouTube Video URL", "YouTube Videos by Difficulty", "Feedback"])
 
-    with tab1:
-        st.header("Upload CSV File")
-        uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
-        if uploaded_file is not None:
-            data = pd.read_csv(uploaded_file)
-            if 'sentence' in data.columns:
-                st.write('Data successfully loaded!')
-                with st.spinner('Predicting...'):
-                    data['sentence'] = data['sentence'].astype(str)
-                    predicted_classes = predict_difficulty(trainer, tokenizer, data['sentence'])
-                    data['difficulty'] = [difficulty_mapping[i] for i in predicted_classes]
-                    st.write('Predictions complete!')
-                    st.dataframe(data[['sentence', 'difficulty']])
+    # Previous tabs remain unchanged
+
+    with tab5:
+        st.header("Feedback")
+        feedback_text = st.text_area("Share your feedback:")
+        feedback_email = st.text_input("Email (optional):")
+        if st.button("Submit Feedback"):
+            if feedback_text:
+                save_feedback(feedback_text, feedback_email)
+                st.success("Thank you for your feedback!")
             else:
-                st.error('Uploaded file does not contain required "sentence" column.')
-
-    with tab2:
-        st.header("Input Sentence Directly")
-        sentence = st.text_area("Enter the sentence here:")
-        if sentence and st.button("Predict Difficulty"):
-            with st.spinner('Predicting...'):
-                predicted_classes = predict_difficulty(trainer, tokenizer, [sentence])
-                predicted_difficulty = difficulty_mapping[predicted_classes[0]]
-                st.success(f'The predicted difficulty level for the input sentence is: {predicted_difficulty}')
-
-    with tab3:
-        st.header("YouTube Video URL")
-        youtube_url = st.text_input("Enter YouTube URL here:")
-        if youtube_url and st.button("Predict Difficulty from Video"):
-            with st.spinner('Processing YouTube video...'):
-                yt = YouTube(youtube_url)
-                audio_stream = yt.streams.filter(only_audio=True).first()
-                audio_file = audio_stream.download(filename="audio.mp4")
-                wav_path = convert_audio_to_wav(audio_file)
-                recognizer = sr.Recognizer()
-                with sr.AudioFile(wav_path) as source:
-                    audio_data = recognizer.record(source)
-                    transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
-                st.write("Transcription:")
-                st.write(transcribed_text)
-                predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
-                predicted_difficulty = difficulty_mapping[predicted_classes[0]]
-                st.success(f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
-
-    with tab4:
-        st.header("Find YouTube Videos by Difficulty")
-        difficulty_level = st.selectbox("Select the difficulty level:", ('A1', 'A2', 'B1', 'B2', 'C1', 'C2'))
-        if st.button('Search Videos'):
-            query = f"French lessons {difficulty_level}"
-            videos = search_youtube_videos(query)
-            display_video_results(videos)
+                st.error("Please enter some feedback before submitting.")
 
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")

@@ -89,11 +89,7 @@ In the project, after evaluating multiple machine learning models, we selected F
 
 These adjustments were essential for tailoring the pre-trained FlauBERT model to our specific needs, leading to improved accuracy and robustness in predicting the difficulty levels of French texts.
 
-### 3.2.3 Results
-
-This two-phase training approach resulted in significantly higher accuracy of 0.640 in predicting text difficulty levels on the unlabeled dataset. This process also demonstrated the effectiveness of fine-tuning a language-specific pre-trained model on a specialized task such as text difficulty classification.
-
-### 3.2.4 Performance Evaluation 
+### 3.2.3 Performance Evaluation 
 #### - **`Compute_metrics`** 
 We use `train_test_split` from `sklearn.model_selection` to divide the dataset into a training set and a validation set, with 10% serving as validation data for periodic performance assessment. It employs `Trainer` from the Hugging Face `transformers` library, configured with `TrainingArguments` to evaluate the model at the end of each epoch, using metrics including accuracy and F1 score computed through a `compute_metrics` function to measure its efficacy in classifying French texts by difficulty levels. After initial training and saving, the script allows for optional continued training to further optimize the model on the same or additional data, adjusting parameters or extending epochs to enhance accuracy and F1 scores.
 
@@ -133,6 +129,18 @@ Post-training, we extend its evaluation methods to include the generation of a c
 
 **Conclusion:**
 The model performs well for lower difficulty levels (A1, A2) with minimal errors. For higher difficulty levels (B2, C1, and C2), the model faces challenges distinguishing between adjacent categories, likely due to similar features in texts of close difficulty levels.
+
+
+### 3.2.4 Predict Test Data and Result
+
+**Test Dataset**
+
+<img width="446" alt="截屏2024-05-22 18 19 56" src="https://github.com/mariamnassar19/ML-project/assets/150010028/6f46139b-1b59-4598-896c-08d6a3de03f8">
+
+To validate our model's real-world accuracy, we tested it with unlabelled test data and submitted the results to Kaggle, achieving an accuracy of 0.638. This outcome demonstrates the effectiveness of our two-phase training approach in fine-tuning a language-specific pre-trained model for specialized tasks like text difficulty classification.
+
+<img width="1054" alt="截屏2024-05-22 18 27 27" src="https://github.com/mariamnassar19/ML-project/assets/150010028/fcc24d7b-9ee1-4a3f-90ed-dd30d9d70a71">
+
 
 ### 3.2.5 Conclusion
 
@@ -179,7 +187,7 @@ In contrast, the FlaubertForSequenceClassification model demonstrated a higher a
 
 ## 3.5  Results and Discussion
 
-The decision to switch to the FlaubertForSequenceClassification model was further validated by its outstanding performance on the Kaggle dataset, where it achieved an accuracy of 0.640. This not only demonstrated the model's practical effectiveness in real-world applications but also led us to achieve a remarkable **second-place** finish in the Kaggle competition. 😄🎉
+The decision to switch to the FlaubertForSequenceClassification model was further validated by its outstanding performance on the Kaggle dataset, where it achieved an accuracy of 0.640(This was our highest score, but when we tried again later we found that the accuracy was now only 0.638). This not only demonstrated the model's practical effectiveness in real-world applications but also led us to achieve a remarkable **second-place** finish in the Kaggle competition. 😄🎉
 <img width="1045" alt="截屏2024-05-21 16 06 28" src="https://github.com/mariamnassar19/ML-project/assets/150010028/c02fd211-6e9a-4060-a5d9-e6c16a19c410">
 
 The Flaubert model's success can be attributed to several factors:

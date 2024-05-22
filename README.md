@@ -203,7 +203,7 @@ In conclusion, choosing the FlaubertForSequenceClassification model over the Cam
 
 # 4. Text Difficulty Prediction App
 
-This Streamlit application predicts the difficulty level of French sentences. It provides various input methods for users to analyze text difficulty and suggest YouTube videos based on difficulty levels. The app uses the `Flaubert` model for text classification and `Whisper` model for speech-to-text transcription.
+This Streamlit application predicts the difficulty level of French sentences.(https://ml-project-jgxspp9ai6nxtklauh38eo.streamlit.app/) It provides various input methods for users to analyze text difficulty and suggest YouTube videos based on difficulty levels. The app uses the `Flaubert` model for text classification and `Whisper` model for speech-to-text transcription.
 
 ## Features
 

@@ -6,9 +6,10 @@ matplotlib
 seaborn
 wordcloud
 pytube
-openai-whisper
+whisper
 google-api-python-client
 nltk
 python-dotenv
 torch
 sacremoses
+

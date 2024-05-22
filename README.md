@@ -249,10 +249,9 @@ This Streamlit application predicts the difficulty level of French sentences.(ht
 2. **Navigate the App**:
    - **Upload CSV**: Upload a CSV file with a `sentence` column.
    - **Input Sentence**: Enter a single sentence in the text area.
-   - **Input Long Text**: Enter long text, such as paragraphs or song lyrics.
-   - **YouTube Video URL**: Enter a YouTube video URL to analyze the audio.
+   - **Input Long Text**: Enter long text, such as paragraphs or song lyrics, and get detailed predictions.
    - **Find YouTube Videos by Difficulty**: Select a difficulty level to get video suggestions.
-   - **Record or Upload Audio**: Upload an audio file to transcribe and analyze.
+   - **Feedback**: Provide feedback about a prediction.
 
 ## Requirements
 
@@ -273,8 +272,6 @@ This Streamlit application predicts the difficulty level of French sentences.(ht
 - SpeechRecognition
 
 
-
-
 ## API Key Configuration
 
 To set up your YouTube API key, you can either hardcode your API key, or follow these steps:
@@ -293,18 +290,6 @@ To set up your YouTube API key, you can either hardcode your API key, or follow 
      load_dotenv()
      api_key = os.getenv('YOUTUBE_API_KEY')
      ```
-
-
-# Ensure ffmpeg is installed
-# On Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install ffmpeg
-
-# On macOS (using Homebrew)
-brew install ffmpeg
-
-# On Windows
-# Download from https://ffmpeg.org/download.html and add the `bin` directory to your system's PATH
 
 # 5. Conclusion
 

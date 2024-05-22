@@ -1,3 +1,4 @@
+python-dotenv
 streamlit
 pandas
 transformers[torch]
@@ -5,15 +6,11 @@ datasets
 matplotlib
 seaborn
 wordcloud
-pytube
 google-api-python-client
 nltk
-python-dotenv
-sacremoses
-accelerate
+pytube
 torch
 SpeechRecognition
-streamlit-player
-pydub
-moviepy
 ffmpeg-python
+sacremoses
+accelerate

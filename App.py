@@ -9,12 +9,16 @@ import traceback
 import warnings
 from pytube import YouTube
 import speech_recognition as sr
+from pydub import AudioSegment
 from googleapiclient.discovery import build
 from nltk.corpus import stopwords
 import nltk
 
 # Download the stopwords from nltk
 nltk.download('stopwords')
+
+# Set pydub to use the installed ffmpeg
+AudioSegment.converter = "/usr/local/bin/ffmpeg"  # Update this path to where ffmpeg is installed
 
 # Retrieve the API key from Streamlit secrets
 api_key = st.secrets["YOUTUBE_API_KEY"]
@@ -52,7 +56,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'shiqi-017/flaubert'
+model_path = 'models/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
@@ -166,13 +170,19 @@ try:
                         audio_stream = yt.streams.filter(only_audio=True).first()
                         audio_file = audio_stream.download(filename="audio.mp4")
 
+                        # Convert audio to WAV format using pydub
+                        audio = AudioSegment.from_file(audio_file)
+                        wav_file = "audio.wav"
+                        audio.export(wav_file, format="wav")
+
                         # Transcribe audio to text using SpeechRecognition
                         recognizer = sr.Recognizer()
-                        with sr.AudioFile(audio_file) as source:
+                        with sr.AudioFile(wav_file) as source:
                             audio = recognizer.record(source)
                             transcribed_text = recognizer.recognize_google(audio, language="fr-FR")
 
-                        os.remove(audio_file)  # Remove audio file after transcription
+                        os.remove(audio_file)  # Remove original audio file after conversion
+                        os.remove(wav_file)  # Remove WAV file after transcription
 
                         st.write("Transcription:")
                         st.write(transcribed_text)

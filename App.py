@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from transformers import FlaubertTokenizer, FlaubertForSequenceClassification, Trainer
 from datasets import Dataset
+import matplotlib.pyplot as plt
 import traceback
 import warnings
 from pytube import YouTube
@@ -67,6 +68,15 @@ def convert_audio_to_wav(audio_path):
     audio.export(wav_path, format="wav")
     return wav_path
 
+def plot_difficulty_distribution(data):
+    plt.figure(figsize=(10, 5))
+    plt.hist(data['difficulty'], bins=len(set(data['difficulty'])), color='skyblue', alpha=0.7)
+    plt.title('Distribution of Sentence Difficulty')
+    plt.xlabel('Difficulty')
+    plt.ylabel('Frequency')
+    plt.grid(True)
+    st.pyplot(plt)
+
 # Suppress specific warnings
 warnings.filterwarnings("ignore", message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
@@ -81,8 +91,8 @@ try:
     st.title('Text Difficulty Prediction App')
     st.write('This application predicts the difficulty level of French sentences. You can upload a CSV file, input sentences directly, or provide a YouTube video URL.')
 
-    # Tab layout for file upload, text input, YouTube video input, and YouTube videos by difficulty
-    tab1, tab2, tab3, tab4 = st.tabs(["Upload CSV", "Input Sentence", "YouTube Video URL", "YouTube Videos by Difficulty"])
+    # Tab layout for file upload, text input, YouTube video input, YouTube videos by difficulty, and feedback
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Upload CSV", "Input Sentence", "YouTube Video URL", "YouTube Videos by Difficulty", "Feedback"])
 
     with tab1:
         st.header("Upload CSV File")
@@ -93,14 +103,12 @@ try:
                 if 'sentence' in data.columns:
                     st.write('Data successfully loaded!')
                     with st.spinner('Predicting...'):
-                        # Processing and prediction
                         data['sentence'] = data['sentence'].astype(str)
                         predicted_classes = predict_difficulty(trainer, tokenizer, data['sentence'])
                         data['difficulty'] = [difficulty_mapping[i] for i in predicted_classes]
-
                         st.write('Predictions complete!')
                         st.dataframe(data[['sentence', 'difficulty']])
-
+                        plot_difficulty_distribution(data)
                         st.download_button(label='Download Predictions', data=data.to_csv(index=False).encode('utf-8'), file_name='predicted_difficulties.csv', mime='text/csv')
                 else:
                     st.error('Uploaded file does not contain required "sentence" column.')
@@ -134,23 +142,18 @@ try:
                         yt = YouTube(youtube_url)
                         audio_stream = yt.streams.filter(only_audio=True).first()
                         audio_file = audio_stream.download(filename="audio.mp4")
-
                         # Convert audio to WAV format
                         wav_path = convert_audio_to_wav(audio_file)
-
                         # Transcribe audio to text
                         recognizer = sr.Recognizer()
                         with sr.AudioFile(wav_path) as source:
                             audio_data = recognizer.record(source)
                             transcribed_text = recognizer.recognize_google(audio_data, language="fr-FR")
-
                         st.write("Transcription:")
                         st.write(transcribed_text)
-
                         # Process the transcribed text
                         predicted_classes = predict_difficulty(trainer, tokenizer, [transcribed_text])
                         predicted_difficulty = difficulty_mapping[predicted_classes[0]]
-
                         st.success(f'The predicted difficulty level for the transcribed video is: {predicted_difficulty}')
                     except Exception as video_error:
                         st.error(f"Error processing video: {video_error}")
@@ -170,6 +173,15 @@ try:
             query = f"French lessons {difficulty_level}"  # Customize query based on difficulty
             videos = search_youtube_videos(query)
             display_video_results(videos)
+
+    with tab5:
+        st.header("We value your feedback!")
+        feedback_text = st.text_area("Please share your experience with us:")
+        feedback_email = st.text_input("Email (optional):")
+        feedback_button = st.button("Submit Feedback")
+        if feedback_button and feedback_text:
+            # Here you would handle saving the feedback to a file or database
+            st.success("Thank you for your feedback!")
 
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")

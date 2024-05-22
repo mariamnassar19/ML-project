@@ -10,6 +10,14 @@ from pydub import AudioSegment
 import os
 from googleapiclient.discovery import build
 from streamlit_player import st_player
+import subprocess
+
+# Check if ffmpeg is installed
+try:
+    subprocess.run(["ffmpeg", "-version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+except FileNotFoundError:
+    st.error("ffmpeg is not installed. Please install ffmpeg and try again.")
+    st.stop()
 
 # Retrieve the API key from Streamlit secrets
 api_key = st.secrets["YOUTUBE_API_KEY"]

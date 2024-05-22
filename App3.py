@@ -13,6 +13,7 @@ from nltk.corpus import stopwords
 import nltk
 import speech_recognition as sr
 import ffmpeg
+from pytube import YouTube
 
 # Download the stopwords from nltk
 nltk.download('stopwords')
@@ -20,6 +21,7 @@ nltk.download('stopwords')
 # Retrieve API key from Streamlit secrets
 youtube_api_key = st.secrets["YOUTUBE_API_KEY"]
 youtube = build('youtube', 'v3', developerKey=youtube_api_key)
+
 
 def search_youtube_videos(query, max_results=10):
     """Search videos on YouTube based on the query."""
@@ -48,7 +50,7 @@ warnings.filterwarnings("ignore",
                         message="do_lowercase_and_remove_accent is passed as a keyword argument, but this won't do anything. FlaubertTokenizer will always set it to False.")
 
 # Load the model and tokenizer
-model_path = 'shiqi-017/flaubert'
+model_path = '/Users/mariamnassar/Documents/Semester 2/Data science and machine learning/project model/content/flaubert_finetuned_full'
 
 try:
     model = FlaubertForSequenceClassification.from_pretrained(model_path)
@@ -190,6 +192,7 @@ try:
 
                         # Convert audio to WAV format using ffmpeg
                         wav_file = "audio.wav"
+                        ffmpeg.input(audio_file).output(wav_file).                        
                         ffmpeg.input(audio_file).output(wav_file).run(overwrite_output=True)
                         os.remove(audio_file)  # Remove original audio file
 
@@ -255,3 +258,5 @@ try:
 except Exception as e:
     st.error("An error occurred: {}".format(str(e)))
     traceback.print_exc()
+
+

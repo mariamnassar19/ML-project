@@ -127,8 +127,7 @@ with tab3:
                     data = pd.DataFrame({'sentence': sentences})
                     dataset = Dataset.from_pandas(data)
                     dataset = dataset.map(
-                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                                   max_length=512), batched=True)
+                        lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
                     dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                     predictions = trainer.predict(dataset).predictions
                     data['difficulty'] = [difficulty_mapping[predictions.argmax(axis=1)[i]] for i in range(len(predictions))]
@@ -165,8 +164,7 @@ with tab4:
                         # Process the transcribed text
                         dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [transcribed_text]}))
                         dataset = dataset.map(
-                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                                       max_length=512), batched=True)
+                            lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
                         dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                         predictions = trainer.predict(dataset).predictions
                         predicted_class = predictions.argmax(axis=1)
@@ -215,8 +213,7 @@ with tab6:
                 # Process the transcribed text
                 dataset = Dataset.from_pandas(pd.DataFrame({'sentence': [transcribed_text]}))
                 dataset = dataset.map(
-                    lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True,
-                                               max_length=512), batched=True)
+                    lambda examples: tokenizer(examples['sentence'], padding="max_length", truncation=True, max_length=512), batched=True)
                 dataset.set_format('torch', columns=['input_ids', 'attention_mask'])
                 predictions = trainer.predict(dataset).predictions
                 predicted_class = predictions.argmax(axis=1)

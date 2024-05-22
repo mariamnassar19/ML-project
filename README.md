@@ -248,18 +248,22 @@ This Streamlit application predicts the difficulty level of French sentences. It
 
 ## Requirements
 
-- `streamlit`
-- `pandas`
-- `transformers`
-- `datasets`
-- `matplotlib`
-- `seaborn`
-- `wordcloud`
-- `pytube`
-- `whisper`
-- `google-api-python-client`
-- `nltk`
-- `python-dotenv`
+- streamlit
+- pandas
+- transformers[torch]
+- datasets
+- matplotlib
+- seaborn
+- wordcloud
+- pytube
+- google-api-python-client
+- nltk
+- python-dotenv
+- sacremoses
+- accelerate
+- torch
+- SpeechRecognition
+
 
 
 

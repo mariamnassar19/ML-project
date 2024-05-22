@@ -200,76 +200,70 @@ Our findings emphasize the importance of ongoing evaluation and adaptation in ma
 In conclusion, choosing the FlaubertForSequenceClassification model over the Camembert approach marks a strategic pivot towards practical deployment scenarios. This decision highlights the need for flexibility in model selection within the dynamic field of AI and machine learning;)
 
 
+# Mon Ami Français
 
-# 4. Text Difficulty Prediction App
-
-This Streamlit application predicts the difficulty level of French sentences.(https://ml-project-jgxspp9ai6nxtklauh38eo.streamlit.app/) It provides various input methods for users to analyze text difficulty and suggest YouTube videos based on difficulty levels. The app uses the `Flaubert` model for text classification and `Whisper` model for speech-to-text transcription.
+Mon Ami Français is a Streamlit web application that predicts the difficulty level of French sentences. The application leverages the Flaubert model from Hugging Face to analyze and categorize text into different levels of difficulty (A1, A2, B1, B2, C1, C2). Users can upload a CSV file, input sentences directly, or input long texts such as song lyrics. Additionally, the app allows users to find YouTube videos by difficulty level and provide feedback on sentence difficulty.
 
 ## Features
 
-1. **Upload CSV**: Upload a CSV file containing French sentences for batch processing.
-2. **Input Sentence**: Enter a single French sentence for difficulty prediction.
-3. **Input Long Text**: Input long French texts, such as song lyrics or paragraphs, for sentence-wise difficulty prediction.
-4. **Find YouTube Videos by Difficulty**: Select a difficulty level to get suggested YouTube videos appropriate for that level.
-5. **Record or Upload Audio**: Upload an audio file to transcribe and predict the difficulty of the transcribed text.
+- **Upload CSV**: Upload a CSV file containing French sentences, and the app will predict the difficulty level for each sentence.
+- **Input Sentence**: Input a single French sentence to get its difficulty level.
+- **Input Long Text**: Input a longer French text (e.g., song lyrics, paragraphs) to analyze each sentence's difficulty.
+- **Find YouTube Videos by Difficulty**: Search for French lessons on YouTube categorized by difficulty level.
+- **Feedback**: Provide feedback by inputting a sentence and selecting its difficulty level.
 
 ## Installation
 
-1. **Clone the Repository**:
-   ```sh
-   git clone https://github.com/your_username/your_repository.git
-   cd your_repository
-   ```
+To run the app locally, follow these steps:
 
-2. **Create a Virtual Environment**:
-   ```sh
-   python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-username/mon-ami-francais.git
+    cd mon-ami-francais
+    ```
 
-3. **Install Dependencies**:
-   ```sh
-   pip install -r requirements.txt
-   ```
+2. **Set up a virtual environment**:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
 
-4. **Set Up Environment Variables**:
-   Create a `.env` file in the root directory and add your YouTube API key:
-   ```sh
-   YOUTUBE_API_KEY=your_actual_api_key
-   ```
+3. **Install the required packages**:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## Usage
+4. **Set up Streamlit secrets**:
+    - Create a `.streamlit` directory in the root of your project.
+    - Inside this directory, create a `secrets.toml` file with your YouTube API key:
+      ```toml
+      [api]
+      youtube_key = "YOUR_YOUTUBE_API_KEY"
+      ```
 
-1. **Run the Streamlit Application**:
-   ```sh
-   streamlit run your_script_name.py
-
-   ```
-
-2. **Navigate the App**:
-   - **Upload CSV**: Upload a CSV file with a `sentence` column.
-   - **Input Sentence**: Enter a single sentence in the text area.
-   - **Input Long Text**: Enter long text, such as paragraphs or song lyrics, and get detailed predictions.
-   - **Find YouTube Videos by Difficulty**: Select a difficulty level to get video suggestions.
-   - **Feedback**: Provide feedback about a prediction.
+5. **Run the app**:
+    ```bash
+    streamlit run app.py
+    ```
 
 ## Requirements
 
-- streamlit
-- pandas
-- transformers[torch]
-- datasets
-- matplotlib
-- seaborn
-- wordcloud
-- pytube
-- google-api-python-client
-- nltk
-- python-dotenv
-- sacremoses
-- accelerate
-- torch
-- SpeechRecognition
+- `streamlit`
+- `pandas`
+- `transformers`
+- `datasets`
+- `matplotlib`
+- `seaborn`
+- `wordcloud`
+- `google-api-python-client`
+- `nltk`
+- `pytube`
+- `torch`
+- `SpeechRecognition`
+- `ffmpeg-python`
+
+![image](https://github.com/mariamnassar19/ML-project/assets/145570066/5b326c7f-ef2f-4ea0-b00a-5eba812465e3)
+
 
 
 ## API Key Configuration

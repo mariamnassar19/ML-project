@@ -214,26 +214,26 @@ Mon Ami Français is a Streamlit web application that predicts the difficulty le
 
 ## Installation
 
-To run the app locally, follow these steps:
+To run the app and deploy it on streamlit, follow these steps:
 
-1. **Clone the repository**:
+1. **Clone the repository**: This step involves copying the repository from GitHub to your local machine:
     ```bash
     git clone https://github.com/your-username/your-repo.git
     cd your-repo
     ```
 
-2. **Set up a virtual environment**:
+2. **Set up a virtual environment**: This helps to create an isolated environment for your project, avoiding conflicts with other Python projects:
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
 
-3. **Install the required packages**:
+3. **Install the required packages**: Install all the dependencies needed for the project, as listed in the requirements.txt file:
     ```bash
     pip install -r requirements.txt
     ```
 
-4. **Set up Streamlit secrets**:
+4. **Set up Streamlit secrets**: Streamlit uses a secrets.toml file to store sensitive information like API keys. Here’s how to set it up:
     - Create a `.streamlit` directory in the root of your project.
     - Inside this directory, create a `secrets.toml` file with your YouTube API key:
       ```toml
@@ -241,9 +241,9 @@ To run the app locally, follow these steps:
       youtube_key = "YOUR_YOUTUBE_API_KEY"
       ```
 
-5. **Run the app**:
+5. **Run the app: App3.py**: Use the Streamlit CLI to run your app:
     ```bash
-    streamlit run app.py
+    streamlit run App3.py
     ```
 
 ## Requirements
@@ -280,16 +280,7 @@ Users select a difficulty level from a dropdown menu and click the search button
 ### Feedback
 Users enter a sentence and select its difficulty level from a dropdown menu. The app stores the feedback in a DataFrame, displays it, and provides an option to download the feedback data as a CSV file.
 
-## Running Locally vs. Deploying on Streamlit Cloud
-### Running Locally
-When running the application locally, you can take full advantage of all its features. The local environment allows for better performance and the inclusion of more resource-intensive features. This includes:
-- Full support for YouTube video processing and transcription.
-- Higher flexibility in handling large datasets.
-- Better performance for model inference and data visualization.
-  
-The code to run the app locally will bbe provided as AppLocal.py, it presents additional features like inputting URL for youtube videos to predict the difficulty.
-
-### Deploying on Streamlit Cloud
+## Deploying on Streamlit Cloud
 Due to the constraints of deploying on Streamlit Cloud, some features needed to be adjusted or removed to ensure smooth operation and compliance with resource limits:
 
 - Feature Adjustments: Certain features like advanced video processing and transcription may be simplified or omitted.

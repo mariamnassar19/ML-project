@@ -289,7 +289,8 @@ Due to the constraints of deploying on Streamlit Cloud, some features needed to 
 Despite these adjustments, the core functionality of the application remains robust, allowing users to predict text difficulty levels effectively.
 
 A feature we had to compromise for example was the ability to input a URL for a youtube video, which is going to be analyzed and transformed into text from audio and then the difficulty will be displayed.
-![image](https://github.com/mariamnassar19/ML-project/assets/145570066/1848a21c-66ae-4552-ab75-cf9369c71386)
+![image](https://github.com/mariamnassar19/ML-project/assets/145570066/56269c1b-00b5-4718-af9d-05a9e66ffe00)
+
 
 
 ## API Key Configuration

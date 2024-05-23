@@ -3,7 +3,7 @@
 # Predicting french text difficulty level
 # 1.  Project Overview
 ## 1.1 Problem Description
-When learning a new language like French, it is critical for learners to engage with texts and multimedia content that are appropriately challenging—neither too easy nor too difficult. People learning French often face difficulties in finding reading materials and video content that match their specific proficiency levels, which range from beginner (A1) to advanced (C2). Traditional methods of selecting texts and videos can be subjective and inconsistent, hindering steady progress in language acquisition. Moreover, learners may struggle to identify which materials suit their current comprehension abilities, leading to potential frustration and decreased motivation. To support learners effectively, there is a pressing need for a tool that can automatically evaluate and classify the difficulty of French texts and the spoken content in French-language videos on platforms like YouTube. This project aims to develop a predictive model that assesses the difficulty level of both written texts and video subtitles in French, thereby helping learners to select materials that align with their learning needs and enhance their overall educational experience. 
+When learning a new language like French, it is critical for learners to engage with texts and multimedia content that are appropriately challenging—neither too easy nor too difficult. People learning French often face difficulties in finding reading materials and video content that match their specific proficiency levels, which range from beginner (A1) to advanced (C2). Traditional methods of selecting texts and videos can be subjective and inconsistent, hindering steady progress in language acquisition. Moreover, learners may struggle to identify which materials suit their current comprehension abilities, leading to potential frustration and decreased motivation. To support learners effectively, there is a pressing need for a tool that can automatically evaluate and classify the difficulty of French texts and the spoken content in French-language videos on platforms like YouTube. This project aims to develop a predictive model that assesses the difficulty level of both written texts and video in French, thereby helping learners to select materials that align with their learning needs and enhance their overall educational experience. 
 ## 1.2 Sustainability
 The predicting French text difficulty model also aligns with the current sustainable development goals. Here’s how the app’s sustainability features correspond to specific Sustainable Development Goals (SDGs):
 
@@ -183,11 +183,11 @@ Therefore, due to these issues, we ultimately decided to abandon the "Not Good M
 
 Upon evaluating different models for predicting the difficulty of French texts, we observed significant differences in their performances. Initially, we considered using the Camembert-based method for its advanced linguistic understanding capabilities. However, our comparative analysis showed that while Camembert excelled in controlled test environments, it was prone to overfitting and had scalability issues when applied to broader, more diverse datasets such as those found in the Kaggle competition.
 
-In contrast, the FlaubertForSequenceClassification model demonstrated a higher accuracy of 0.640 on the Kaggle platform. Unlike Camembert, Flaubert proved to be better suited for this specific task due to its robustness across different data distributions and its more stable performance in varied testing conditions. This model provided a more balanced approach, efficiently handling the nuances of text difficulty classification without the computational intensity and overfitting concerns associated with Camembert.
+In contrast, the Flaubert model demonstrated a higher accuracy of 0.640 on the Kaggle platform. Unlike Camembert, Flaubert proved to be better suited for this specific task due to its robustness across different data distributions and its more stable performance in varied testing conditions. This model provided a more balanced approach, efficiently handling the nuances of text difficulty classification without the computational intensity and overfitting concerns associated with Camembert.
 
 ## 3.5  Results and Discussion
 
-The decision to switch to the FlaubertForSequenceClassification model was further validated by its outstanding performance on the Kaggle dataset, where it achieved an accuracy of 0.640(This was our highest score, but when we tried again later we found that the accuracy was now only 0.638). This not only demonstrated the model's practical effectiveness in real-world applications but also led us to achieve a remarkable **second-place** finish in the Kaggle competition. 😄🎉
+The decision to switch to the Flaubert model was further validated by its outstanding performance on the Kaggle dataset, where it achieved an accuracy of 0.640(This was our highest score, but when we tried again later we found that the accuracy was now only 0.638). This not only demonstrated the model's practical effectiveness in real-world applications but also led us to achieve a remarkable **second-place** finish in the Kaggle competition. 😄🎉
 <img width="1045" alt="截屏2024-05-21 16 06 28" src="https://github.com/mariamnassar19/ML-project/assets/150010028/c02fd211-6e9a-4060-a5d9-e6c16a19c410">
 
 The Flaubert model's success can be attributed to several factors:
@@ -197,7 +197,7 @@ The Flaubert model's success can be attributed to several factors:
 
 Our findings emphasize the importance of ongoing evaluation and adaptation in machine learning projects. Adjusting strategies based on model performance comparisons leads to better-informed decisions and more effective deployments.
 
-In conclusion, choosing the FlaubertForSequenceClassification model over the Camembert approach marks a strategic pivot towards practical deployment scenarios. This decision highlights the need for flexibility in model selection within the dynamic field of AI and machine learning;)
+In conclusion, choosing the Flaubert model over the Camembert approach marks a strategic pivot towards practical deployment scenarios. This decision highlights the need for flexibility in model selection within the dynamic field of AI and machine learning;)
 
 
 # 4. Mon Ami Français

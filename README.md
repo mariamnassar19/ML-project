@@ -288,6 +288,10 @@ Due to the constraints of deploying on Streamlit Cloud, some features needed to 
 
 Despite these adjustments, the core functionality of the application remains robust, allowing users to predict text difficulty levels effectively.
 
+An feature we had to compromise for example was the ability to input a URL for a youtube video, which is going to be analyzed and transformed into text from audio and then the difficulty will be displayed.
+![image](https://github.com/mariamnassar19/ML-project/assets/145570066/1848a21c-66ae-4552-ab75-cf9369c71386)
+
+
 ## API Key Configuration
 
 To set up your YouTube API key, you can either hardcode your API key, or follow these steps:
